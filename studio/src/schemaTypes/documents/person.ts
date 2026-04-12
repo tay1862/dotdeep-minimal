@@ -2,11 +2,6 @@ import {UserIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 import type {Person} from '../../../sanity.types'
 
-/**
- * Person schema.  Define and edit the fields for the 'person' content type.
- * Learn more: https://www.sanity.io/docs/studio/schema-types
- */
-
 export const person = defineType({
   name: 'person',
   title: 'Person',
@@ -26,6 +21,17 @@ export const person = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'role',
+      title: 'Role / Position',
+      type: 'localizedString',
+      description: 'e.g. "Lead Designer", "Web Developer"',
+    }),
+    defineField({
+      name: 'bio',
+      title: 'Short Bio',
+      type: 'localizedString',
+    }),
+    defineField({
       name: 'picture',
       title: 'Picture',
       type: 'image',
@@ -36,7 +42,6 @@ export const person = defineType({
           title: 'Alternative text',
           description: 'Important for SEO and accessibility.',
           validation: (rule) => {
-            // Custom validation to ensure alt text is provided if the image is present. https://www.sanity.io/docs/validation
             return rule.custom((alt, context) => {
               const document = context.document as Person
               if (document?.picture?.asset?._ref && !alt) {
@@ -49,24 +54,34 @@ export const person = defineType({
       ],
       options: {
         hotspot: true,
-        aiAssist: {
-          imageDescriptionField: 'alt',
-        },
+        aiAssist: {imageDescriptionField: 'alt'},
       },
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: 'socialLinks',
+      title: 'Social Links',
+      type: 'socialLinks',
+    }),
+    defineField({
+      name: 'order',
+      title: 'Display Order',
+      type: 'number',
+      initialValue: 0,
+    }),
   ],
-  // List preview configuration. https://www.sanity.io/docs/previews-list-views
+  orderings: [{title: 'Order', name: 'order', by: [{field: 'order', direction: 'asc'}]}],
   preview: {
     select: {
       firstName: 'firstName',
       lastName: 'lastName',
+      role: 'role.en',
       picture: 'picture',
     },
     prepare(selection) {
       return {
         title: `${selection.firstName} ${selection.lastName}`,
-        subtitle: 'Person',
+        subtitle: selection.role || 'Person',
         media: selection.picture,
       }
     },

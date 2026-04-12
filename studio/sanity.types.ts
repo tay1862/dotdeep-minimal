@@ -15,6 +15,37 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
+export type Stat = {
+  _type: 'stat'
+  value: string
+  suffix?: string
+  label: LocalizedString
+}
+
+export type SocialLinks = {
+  _type: 'socialLinks'
+  whatsapp?: string
+  line?: string
+  facebook?: string
+  instagram?: string
+  tiktok?: string
+  linkedin?: string
+}
+
+export type LocalizedBlockContent = {
+  _type: 'localizedBlockContent'
+  en?: BlockContent
+  th?: BlockContent
+  lo?: BlockContent
+}
+
+export type LocalizedString = {
+  _type: 'localizedString'
+  en?: string
+  th?: string
+  lo?: string
+}
+
 export type PageReference = {
   _ref: string
   _type: 'reference'
@@ -127,6 +158,210 @@ export type Button = {
   link?: Link
 }
 
+export type ClientLogo = {
+  _id: string
+  _type: 'clientLogo'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  logo: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  url?: string
+  order?: number
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type Testimonial = {
+  _id: string
+  _type: 'testimonial'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  company?: string
+  quote: LocalizedString
+  avatar?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  rating?: number
+  order?: number
+}
+
+export type ServiceReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'service'
+}
+
+export type PricingItem = {
+  _id: string
+  _type: 'pricingItem'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: LocalizedString
+  service?: ServiceReference
+  price?: number
+  currency?: 'LAK' | 'USD' | 'THB'
+  description?: LocalizedString
+  features?: Array<
+    {
+      _key: string
+    } & LocalizedString
+  >
+  order?: number
+}
+
+export type Service = {
+  _id: string
+  _type: 'service'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: LocalizedString
+  slug: Slug
+  shortDescription?: LocalizedString
+  description?: LocalizedBlockContent
+  icon?: string
+  features?: Array<
+    {
+      _key: string
+    } & LocalizedString
+  >
+  order?: number
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
+export type Project = {
+  _id: string
+  _type: 'project'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: LocalizedString
+  slug: Slug
+  client?: string
+  category: 'graphic' | 'web' | 'uiux' | 'video'
+  description?: LocalizedBlockContent
+  coverImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  images?: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+    _key: string
+  }>
+  techStack?: Array<string>
+  projectUrl?: string
+  videoUrl?: string
+  featured?: boolean
+  order?: number
+  completedAt?: string
+}
+
+export type AboutPage = {
+  _id: string
+  _type: 'aboutPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  heading?: LocalizedString
+  vision?: LocalizedBlockContent
+  mission?: LocalizedBlockContent
+  story?: LocalizedBlockContent
+  storyImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  techStack?: Array<{
+    name?: string
+    icon?: string
+    _key: string
+  }>
+}
+
+export type ProjectReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'project'
+}
+
+export type HomePage = {
+  _id: string
+  _type: 'homePage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  heroHeading: LocalizedString
+  heroSubheading?: LocalizedString
+  heroCtaText?: LocalizedString
+  heroCtaLink?: string
+  heroImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  stats?: Array<
+    {
+      _key: string
+    } & Stat
+  >
+  featuredProjects?: Array<
+    {
+      _key: string
+    } & ProjectReference
+  >
+  servicesHeading?: LocalizedString
+  ctaHeading?: LocalizedString
+  ctaText?: LocalizedString
+}
+
 export type Settings = {
   _id: string
   _type: 'settings'
@@ -165,22 +400,11 @@ export type Settings = {
     metadataBase?: string
     _type: 'image'
   }
-}
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
+  socialLinks?: SocialLinks
+  contactEmail?: string
+  contactPhone?: string
+  address?: LocalizedString
+  googleMapsEmbed?: string
 }
 
 export type Page = {
@@ -240,6 +464,8 @@ export type Person = {
   _rev: string
   firstName: string
   lastName: string
+  role?: LocalizedString
+  bio?: LocalizedString
   picture: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -248,12 +474,8 @@ export type Person = {
     alt?: string
     _type: 'image'
   }
-}
-
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
+  socialLinks?: SocialLinks
+  order?: number
 }
 
 export type SanityAssistInstructionTask = {
@@ -491,6 +713,10 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
+  | Stat
+  | SocialLinks
+  | LocalizedBlockContent
+  | LocalizedString
   | PageReference
   | PostReference
   | Link
@@ -500,14 +726,23 @@ export type AllSanitySchemaTypes =
   | BlockContentTextOnly
   | BlockContent
   | Button
-  | Settings
+  | ClientLogo
   | SanityImageCrop
   | SanityImageHotspot
+  | Testimonial
+  | ServiceReference
+  | PricingItem
+  | Service
+  | Slug
+  | Project
+  | AboutPage
+  | ProjectReference
+  | HomePage
+  | Settings
   | Page
   | PersonReference
   | Post
   | Person
-  | Slug
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations

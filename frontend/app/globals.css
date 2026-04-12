@@ -1,45 +1,217 @@
 @import 'tailwindcss';
 
+@config "../tailwind.config.ts";
 @plugin "@tailwindcss/typography";
 
-@layer base {
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-medium tracking-tight;
-  }
+/* ===== OKLCH Color Palette — DotDeep Design ===== */
+@theme {
+  /* Brand Blue (from logo) */
+  --color-brand-50: oklch(0.97 0.02 264);
+  --color-brand-100: oklch(0.93 0.04 264);
+  --color-brand-200: oklch(0.87 0.08 264);
+  --color-brand-300: oklch(0.75 0.14 264);
+  --color-brand-400: oklch(0.63 0.20 264);
+  --color-brand-500: oklch(0.52 0.24 264);
+  --color-brand-600: oklch(0.45 0.22 264);
+  --color-brand-700: oklch(0.38 0.18 264);
+  --color-brand-800: oklch(0.30 0.14 264);
+  --color-brand-900: oklch(0.22 0.10 264);
+  --color-brand-950: oklch(0.15 0.06 264);
+
+  /* Warm Amber Accent */
+  --color-accent-300: oklch(0.88 0.12 75);
+  --color-accent-400: oklch(0.82 0.15 75);
+  --color-accent-500: oklch(0.75 0.16 75);
+  --color-accent-600: oklch(0.65 0.14 75);
+  --color-accent-700: oklch(0.55 0.12 75);
+
+  /* Blue-tinted Neutrals */
+  --color-neutral-50: oklch(0.98 0.005 264);
+  --color-neutral-100: oklch(0.95 0.008 264);
+  --color-neutral-200: oklch(0.90 0.01 264);
+  --color-neutral-300: oklch(0.84 0.012 264);
+  --color-neutral-400: oklch(0.70 0.015 264);
+  --color-neutral-500: oklch(0.58 0.018 264);
+  --color-neutral-600: oklch(0.48 0.02 264);
+  --color-neutral-700: oklch(0.38 0.02 264);
+  --color-neutral-800: oklch(0.27 0.02 264);
+  --color-neutral-900: oklch(0.20 0.02 264);
+  --color-neutral-950: oklch(0.13 0.02 264);
+
+  /* Semantic */
+  --color-success: oklch(0.65 0.18 145);
+  --color-error: oklch(0.60 0.22 25);
+  --color-warning: oklch(0.78 0.16 75);
+
+  /* Surface colors (light/dark aware via CSS custom properties below) */
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-muted: var(--on-surface-muted);
+  --color-border-default: var(--border-default);
+
+  /* Spacing scale (4pt) */
+  --spacing-0: 0px;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-24: 96px;
+
+  --default-transition-duration: 200ms;
+
+  /* Font Families */
+  --font-family-display: var(--font-display), system-ui, sans-serif;
+  --font-family-body: var(--font-body), system-ui, sans-serif;
+  --font-family-lao: var(--font-hinsiew), var(--font-noto-lao), system-ui, sans-serif;
+  --font-family-thai: var(--font-noto-thai), system-ui, sans-serif;
 }
 
-@utility container {
-  margin: 0 auto;
-  padding: 0 2rem;
+/* ===== Theme Variables ===== */
+:root {
+  --surface: oklch(0.98 0.005 264);
+  --surface-raised: oklch(1 0 0);
+  --on-surface: oklch(0.18 0.02 264);
+  --on-surface-muted: oklch(0.48 0.02 264);
+  --border-default: oklch(0.90 0.01 264);
+  color-scheme: light;
+}
+
+:root.dark {
+  --surface: oklch(0.13 0.02 264);
+  --surface-raised: oklch(0.18 0.025 264);
+  --on-surface: oklch(0.93 0.008 264);
+  --on-surface-muted: oklch(0.62 0.015 264);
+  --border-default: oklch(0.25 0.025 264);
+  color-scheme: dark;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --shadow-layer: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+/* ===== Typography ===== */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
 
-  --color-framework: #000;
-  --color-black: #0b0b0b;
-  --color-white: #fff;
-  --color-brand: #f50;
-  --color-blue: #0052ff;
-  --color-yellow: #cdea19;
-  --color-gray-50: #f6f6f8;
-  --color-gray-100: #eeeef1;
-  --color-gray-200: #e3e4e8;
-  --color-gray-300: #bbbdc9;
-  --color-gray-400: #9499ad;
-  --color-gray-500: #727892;
-  --color-gray-600: #515870;
-  --color-gray-700: #383d51;
-  --color-gray-800: #252837;
-  --color-gray-900: #1b1d27;
-  --color-gray-950: #13141b;
+  body {
+    @apply bg-surface text-on-surface font-body;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 
-  --default-transition-duration: 250ms;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+
+  /* Lao script specific rules */
+  :lang(lo) {
+    font-family: var(--font-hinsiew), var(--font-noto-lao), var(--font-body), system-ui, sans-serif;
+    line-height: 1.8;
+  }
+
+  [data-locale='lo'] h1,
+  [data-locale='lo'] h2,
+  [data-locale='lo'] h3,
+  [data-locale='lo'] h4,
+  [data-locale='lo'] h5,
+  [data-locale='lo'] h6,
+  [data-locale='lo'] .font-display {
+    font-family: var(--font-hinsiew), var(--font-noto-lao), var(--font-body), system-ui, sans-serif;
+    letter-spacing: 0;
+  }
+
+  :lang(th) {
+    font-family: var(--font-noto-thai), var(--font-body), system-ui, sans-serif;
+    line-height: 1.7;
+  }
 }
+
+/* ===== Utilities ===== */
+@utility container {
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 0 clamp(1rem, 4vw, 2rem);
+}
+
+/* Fluid type scale (major third 1.25) */
+@utility text-fluid-xs {
+  font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+}
+
+@utility text-fluid-sm {
+  font-size: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+}
+
+@utility text-fluid-base {
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+}
+
+@utility text-fluid-lg {
+  font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+}
+
+@utility text-fluid-xl {
+  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+}
+
+@utility text-fluid-2xl {
+  font-size: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+}
+
+@utility text-fluid-3xl {
+  font-size: clamp(2.5rem, 1.8rem + 3.5vw, 4rem);
+}
+
+@utility text-fluid-4xl {
+  font-size: clamp(3rem, 2rem + 5vw, 5.5rem);
+}
+
+/* Scroll reveal animation base */
+@utility reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@utility revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@utility stagger-1 { transition-delay: 0.05s; }
+@utility stagger-2 { transition-delay: 0.1s; }
+@utility stagger-3 { transition-delay: 0.15s; }
+@utility stagger-4 { transition-delay: 0.2s; }
+@utility stagger-5 { transition-delay: 0.25s; }
+@utility stagger-6 { transition-delay: 0.3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Masonry layout */
+@utility masonry {
+  columns: 1;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .masonry { columns: 2; }
+}
+
+@media (min-width: 1024px) {
+  .masonry { columns: 3; }
+}
+

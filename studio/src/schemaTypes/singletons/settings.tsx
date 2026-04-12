@@ -156,6 +156,33 @@ export const settings = defineType({
         }),
       ],
     }),
+    // === DotDeep additions ===
+    defineField({
+      name: 'socialLinks',
+      title: 'Social Links',
+      type: 'socialLinks',
+    }),
+    defineField({
+      name: 'contactEmail',
+      title: 'Contact Email',
+      type: 'string',
+    }),
+    defineField({
+      name: 'contactPhone',
+      title: 'Contact Phone',
+      type: 'string',
+    }),
+    defineField({
+      name: 'address',
+      title: 'Address',
+      type: 'localizedString',
+    }),
+    defineField({
+      name: 'googleMapsEmbed',
+      title: 'Google Maps Embed URL',
+      type: 'url',
+      description: 'Paste the Google Maps embed src URL',
+    }),
   ],
   preview: {
     prepare() {

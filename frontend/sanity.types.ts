@@ -15,6 +15,37 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
+export type Stat = {
+  _type: 'stat'
+  value: string
+  suffix?: string
+  label: LocalizedString
+}
+
+export type SocialLinks = {
+  _type: 'socialLinks'
+  whatsapp?: string
+  line?: string
+  facebook?: string
+  instagram?: string
+  tiktok?: string
+  linkedin?: string
+}
+
+export type LocalizedBlockContent = {
+  _type: 'localizedBlockContent'
+  en?: BlockContent
+  th?: BlockContent
+  lo?: BlockContent
+}
+
+export type LocalizedString = {
+  _type: 'localizedString'
+  en?: string
+  th?: string
+  lo?: string
+}
+
 export type PageReference = {
   _ref: string
   _type: 'reference'
@@ -127,6 +158,210 @@ export type Button = {
   link?: Link
 }
 
+export type ClientLogo = {
+  _id: string
+  _type: 'clientLogo'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  logo: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  url?: string
+  order?: number
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type Testimonial = {
+  _id: string
+  _type: 'testimonial'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  company?: string
+  quote: LocalizedString
+  avatar?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  rating?: number
+  order?: number
+}
+
+export type ServiceReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'service'
+}
+
+export type PricingItem = {
+  _id: string
+  _type: 'pricingItem'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: LocalizedString
+  service?: ServiceReference
+  price?: number
+  currency?: 'LAK' | 'USD' | 'THB'
+  description?: LocalizedString
+  features?: Array<
+    {
+      _key: string
+    } & LocalizedString
+  >
+  order?: number
+}
+
+export type Service = {
+  _id: string
+  _type: 'service'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: LocalizedString
+  slug: Slug
+  shortDescription?: LocalizedString
+  description?: LocalizedBlockContent
+  icon?: string
+  features?: Array<
+    {
+      _key: string
+    } & LocalizedString
+  >
+  order?: number
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
+export type Project = {
+  _id: string
+  _type: 'project'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: LocalizedString
+  slug: Slug
+  client?: string
+  category: 'graphic' | 'web' | 'uiux' | 'video'
+  description?: LocalizedBlockContent
+  coverImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  images?: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+    _key: string
+  }>
+  techStack?: Array<string>
+  projectUrl?: string
+  videoUrl?: string
+  featured?: boolean
+  order?: number
+  completedAt?: string
+}
+
+export type AboutPage = {
+  _id: string
+  _type: 'aboutPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  heading?: LocalizedString
+  vision?: LocalizedBlockContent
+  mission?: LocalizedBlockContent
+  story?: LocalizedBlockContent
+  storyImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  techStack?: Array<{
+    name?: string
+    icon?: string
+    _key: string
+  }>
+}
+
+export type ProjectReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'project'
+}
+
+export type HomePage = {
+  _id: string
+  _type: 'homePage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  heroHeading: LocalizedString
+  heroSubheading?: LocalizedString
+  heroCtaText?: LocalizedString
+  heroCtaLink?: string
+  heroImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  stats?: Array<
+    {
+      _key: string
+    } & Stat
+  >
+  featuredProjects?: Array<
+    {
+      _key: string
+    } & ProjectReference
+  >
+  servicesHeading?: LocalizedString
+  ctaHeading?: LocalizedString
+  ctaText?: LocalizedString
+}
+
 export type Settings = {
   _id: string
   _type: 'settings'
@@ -165,22 +400,11 @@ export type Settings = {
     metadataBase?: string
     _type: 'image'
   }
-}
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
+  socialLinks?: SocialLinks
+  contactEmail?: string
+  contactPhone?: string
+  address?: LocalizedString
+  googleMapsEmbed?: string
 }
 
 export type Page = {
@@ -240,6 +464,8 @@ export type Person = {
   _rev: string
   firstName: string
   lastName: string
+  role?: LocalizedString
+  bio?: LocalizedString
   picture: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -248,12 +474,8 @@ export type Person = {
     alt?: string
     _type: 'image'
   }
-}
-
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
+  socialLinks?: SocialLinks
+  order?: number
 }
 
 export type SanityAssistInstructionTask = {
@@ -491,6 +713,10 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
+  | Stat
+  | SocialLinks
+  | LocalizedBlockContent
+  | LocalizedString
   | PageReference
   | PostReference
   | Link
@@ -500,14 +726,23 @@ export type AllSanitySchemaTypes =
   | BlockContentTextOnly
   | BlockContent
   | Button
-  | Settings
+  | ClientLogo
   | SanityImageCrop
   | SanityImageHotspot
+  | Testimonial
+  | ServiceReference
+  | PricingItem
+  | Service
+  | Slug
+  | Project
+  | AboutPage
+  | ProjectReference
+  | HomePage
+  | Settings
   | Page
   | PersonReference
   | Post
   | Person
-  | Slug
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations
@@ -571,6 +806,11 @@ export type SettingsQueryResult = {
     metadataBase?: string
     _type: 'image'
   }
+  socialLinks?: SocialLinks
+  contactEmail?: string
+  contactPhone?: string
+  address?: LocalizedString
+  googleMapsEmbed?: string
 } | null
 
 // Source: sanity/lib/queries.ts
@@ -813,6 +1053,258 @@ export type PagesSlugsResult = Array<{
   slug: string
 }>
 
+// Source: sanity/lib/queries.ts
+// Variable: homePageQuery
+// Query: *[_type == "homePage"][0]{    heroHeading,    heroSubheading,    heroCtaText,    heroCtaLink,    heroImage,    stats[]{value, suffix, label},    "featuredProjects": featuredProjects[]->{      _id,      title,      "slug": slug.current,      category,      coverImage,      client,      completedAt    },    servicesHeading,    ctaHeading,    ctaText  }
+export type HomePageQueryResult = {
+  heroHeading: LocalizedString
+  heroSubheading: LocalizedString | null
+  heroCtaText: LocalizedString | null
+  heroCtaLink: string | null
+  heroImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  } | null
+  stats: Array<{
+    value: string
+    suffix: string | null
+    label: LocalizedString
+  }> | null
+  featuredProjects: Array<{
+    _id: string
+    title: LocalizedString
+    slug: string
+    category: 'graphic' | 'uiux' | 'video' | 'web'
+    coverImage: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    client: string | null
+    completedAt: string | null
+  }> | null
+  servicesHeading: LocalizedString | null
+  ctaHeading: LocalizedString | null
+  ctaText: LocalizedString | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: allProjectsQuery
+// Query: *[_type == "project"] | order(order asc, completedAt desc) {    _id,    title,    "slug": slug.current,    category,    coverImage,    client,    description,    techStack,    featured,    completedAt  }
+export type AllProjectsQueryResult = Array<{
+  _id: string
+  title: LocalizedString
+  slug: string
+  category: 'graphic' | 'uiux' | 'video' | 'web'
+  coverImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  client: string | null
+  description: LocalizedBlockContent | null
+  techStack: Array<string> | null
+  featured: boolean | null
+  completedAt: string | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: projectBySlugQuery
+// Query: *[_type == "project" && slug.current == $slug][0]{    _id,    title,    "slug": slug.current,    category,    coverImage,    images,    client,    description,    techStack,    projectUrl,    videoUrl,    completedAt  }
+export type ProjectBySlugQueryResult = {
+  _id: string
+  title: LocalizedString
+  slug: string
+  category: 'graphic' | 'uiux' | 'video' | 'web'
+  coverImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  images: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+    _key: string
+  }> | null
+  client: string | null
+  description: LocalizedBlockContent | null
+  techStack: Array<string> | null
+  projectUrl: string | null
+  videoUrl: string | null
+  completedAt: string | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: allServicesQuery
+// Query: *[_type == "service"] | order(order asc) {    _id,    title,    "slug": slug.current,    shortDescription,    icon,    features  }
+export type AllServicesQueryResult = Array<{
+  _id: string
+  title: LocalizedString
+  slug: string
+  shortDescription: LocalizedString | null
+  icon: string | null
+  features: Array<
+    {
+      _key: string
+    } & LocalizedString
+  > | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: serviceBySlugQuery
+// Query: *[_type == "service" && slug.current == $slug][0]{    _id,    title,    "slug": slug.current,    shortDescription,    description,    icon,    features,    "pricingItems": *[_type == "pricingItem" && references(^._id)] | order(order asc) {      _id,      name,      price,      currency,      description,      features    }  }
+export type ServiceBySlugQueryResult = {
+  _id: string
+  title: LocalizedString
+  slug: string
+  shortDescription: LocalizedString | null
+  description: LocalizedBlockContent | null
+  icon: string | null
+  features: Array<
+    {
+      _key: string
+    } & LocalizedString
+  > | null
+  pricingItems: Array<{
+    _id: string
+    name: LocalizedString
+    price: number | null
+    currency: 'LAK' | 'THB' | 'USD' | null
+    description: LocalizedString | null
+    features: Array<
+      {
+        _key: string
+      } & LocalizedString
+    > | null
+  }>
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: allPricingQuery
+// Query: *[_type == "pricingItem"] | order(order asc) {    _id,    name,    price,    currency,    description,    features,    "service": service->{title, "slug": slug.current}  }
+export type AllPricingQueryResult = Array<{
+  _id: string
+  name: LocalizedString
+  price: number | null
+  currency: 'LAK' | 'THB' | 'USD' | null
+  description: LocalizedString | null
+  features: Array<
+    {
+      _key: string
+    } & LocalizedString
+  > | null
+  service: {
+    title: LocalizedString
+    slug: string
+  } | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: aboutPageQuery
+// Query: *[_type == "aboutPage"][0]{    heading,    vision,    mission,    story,    storyImage,    techStack  }
+export type AboutPageQueryResult = {
+  heading: LocalizedString | null
+  vision: LocalizedBlockContent | null
+  mission: LocalizedBlockContent | null
+  story: LocalizedBlockContent | null
+  storyImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  } | null
+  techStack: Array<{
+    name?: string
+    icon?: string
+    _key: string
+  }> | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: allTeamQuery
+// Query: *[_type == "person"] | order(order asc) {    _id,    firstName,    lastName,    picture,    role,    bio,    socialLinks  }
+export type AllTeamQueryResult = Array<{
+  _id: string
+  firstName: string
+  lastName: string
+  picture: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  role: LocalizedString | null
+  bio: LocalizedString | null
+  socialLinks: SocialLinks | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: allTestimonialsQuery
+// Query: *[_type == "testimonial"] | order(order asc) {    _id,    name,    company,    quote,    avatar,    rating  }
+export type AllTestimonialsQueryResult = Array<{
+  _id: string
+  name: string
+  company: string | null
+  quote: LocalizedString
+  avatar: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  } | null
+  rating: number | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: allClientLogosQuery
+// Query: *[_type == "clientLogo"] | order(order asc) {    _id,    name,    logo,    url  }
+export type AllClientLogosQueryResult = Array<{
+  _id: string
+  name: string
+  logo: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  url: string | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: projectSlugs
+// Query: *[_type == "project" && defined(slug.current)]  {"slug": slug.current}
+export type ProjectSlugsResult = Array<{
+  slug: string
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: serviceSlugs
+// Query: *[_type == "service" && defined(slug.current)]  {"slug": slug.current}
+export type ServiceSlugsResult = Array<{
+  slug: string
+}>
+
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
@@ -825,5 +1317,17 @@ declare module '@sanity/client' {
     '\n  *[_type == "post" && slug.current == $slug] [0] {\n    content[]{\n    ...,\n    markDefs[]{\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n    }\n  },\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': PostQueryResult
     '\n  *[_type == "post" && defined(slug.current)]\n  {"slug": slug.current}\n': PostPagesSlugsResult
     '\n  *[_type == "page" && defined(slug.current)]\n  {"slug": slug.current}\n': PagesSlugsResult
+    '\n  *[_type == "homePage"][0]{\n    heroHeading,\n    heroSubheading,\n    heroCtaText,\n    heroCtaLink,\n    heroImage,\n    stats[]{value, suffix, label},\n    "featuredProjects": featuredProjects[]->{\n      _id,\n      title,\n      "slug": slug.current,\n      category,\n      coverImage,\n      client,\n      completedAt\n    },\n    servicesHeading,\n    ctaHeading,\n    ctaText\n  }\n': HomePageQueryResult
+    '\n  *[_type == "project"] | order(order asc, completedAt desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    category,\n    coverImage,\n    client,\n    description,\n    techStack,\n    featured,\n    completedAt\n  }\n': AllProjectsQueryResult
+    '\n  *[_type == "project" && slug.current == $slug][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    category,\n    coverImage,\n    images,\n    client,\n    description,\n    techStack,\n    projectUrl,\n    videoUrl,\n    completedAt\n  }\n': ProjectBySlugQueryResult
+    '\n  *[_type == "service"] | order(order asc) {\n    _id,\n    title,\n    "slug": slug.current,\n    shortDescription,\n    icon,\n    features\n  }\n': AllServicesQueryResult
+    '\n  *[_type == "service" && slug.current == $slug][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    shortDescription,\n    description,\n    icon,\n    features,\n    "pricingItems": *[_type == "pricingItem" && references(^._id)] | order(order asc) {\n      _id,\n      name,\n      price,\n      currency,\n      description,\n      features\n    }\n  }\n': ServiceBySlugQueryResult
+    '\n  *[_type == "pricingItem"] | order(order asc) {\n    _id,\n    name,\n    price,\n    currency,\n    description,\n    features,\n    "service": service->{title, "slug": slug.current}\n  }\n': AllPricingQueryResult
+    '\n  *[_type == "aboutPage"][0]{\n    heading,\n    vision,\n    mission,\n    story,\n    storyImage,\n    techStack\n  }\n': AboutPageQueryResult
+    '\n  *[_type == "person"] | order(order asc) {\n    _id,\n    firstName,\n    lastName,\n    picture,\n    role,\n    bio,\n    socialLinks\n  }\n': AllTeamQueryResult
+    '\n  *[_type == "testimonial"] | order(order asc) {\n    _id,\n    name,\n    company,\n    quote,\n    avatar,\n    rating\n  }\n': AllTestimonialsQueryResult
+    '\n  *[_type == "clientLogo"] | order(order asc) {\n    _id,\n    name,\n    logo,\n    url\n  }\n': AllClientLogosQueryResult
+    '\n  *[_type == "project" && defined(slug.current)]\n  {"slug": slug.current}\n': ProjectSlugsResult
+    '\n  *[_type == "service" && defined(slug.current)]\n  {"slug": slug.current}\n': ServiceSlugsResult
   }
 }

@@ -99,3 +99,156 @@ export const pagesSlugs = defineQuery(`
   *[_type == "page" && defined(slug.current)]
   {"slug": slug.current}
 `)
+
+// ─── DotDeep Queries ────────────────────────────────────────────
+
+export const homePageQuery = defineQuery(`
+  *[_type == "homePage"][0]{
+    heroHeading,
+    heroSubheading,
+    heroCtaText,
+    heroCtaLink,
+    heroImage,
+    stats[]{value, suffix, label},
+    "featuredProjects": featuredProjects[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      category,
+      coverImage,
+      client,
+      completedAt
+    },
+    servicesHeading,
+    ctaHeading,
+    ctaText
+  }
+`)
+
+export const allProjectsQuery = defineQuery(`
+  *[_type == "project"] | order(order asc, completedAt desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    category,
+    coverImage,
+    client,
+    description,
+    techStack,
+    featured,
+    completedAt
+  }
+`)
+
+export const projectBySlugQuery = defineQuery(`
+  *[_type == "project" && slug.current == $slug][0]{
+    _id,
+    title,
+    "slug": slug.current,
+    category,
+    coverImage,
+    images,
+    client,
+    description,
+    techStack,
+    projectUrl,
+    videoUrl,
+    completedAt
+  }
+`)
+
+export const allServicesQuery = defineQuery(`
+  *[_type == "service"] | order(order asc) {
+    _id,
+    title,
+    "slug": slug.current,
+    shortDescription,
+    icon,
+    features
+  }
+`)
+
+export const serviceBySlugQuery = defineQuery(`
+  *[_type == "service" && slug.current == $slug][0]{
+    _id,
+    title,
+    "slug": slug.current,
+    shortDescription,
+    description,
+    icon,
+    features,
+    "pricingItems": *[_type == "pricingItem" && references(^._id)] | order(order asc) {
+      _id,
+      name,
+      price,
+      currency,
+      description,
+      features
+    }
+  }
+`)
+
+export const allPricingQuery = defineQuery(`
+  *[_type == "pricingItem"] | order(order asc) {
+    _id,
+    name,
+    price,
+    currency,
+    description,
+    features,
+    "service": service->{title, "slug": slug.current}
+  }
+`)
+
+export const aboutPageQuery = defineQuery(`
+  *[_type == "aboutPage"][0]{
+    heading,
+    vision,
+    mission,
+    story,
+    storyImage,
+    techStack
+  }
+`)
+
+export const allTeamQuery = defineQuery(`
+  *[_type == "person"] | order(order asc) {
+    _id,
+    firstName,
+    lastName,
+    picture,
+    role,
+    bio,
+    socialLinks
+  }
+`)
+
+export const allTestimonialsQuery = defineQuery(`
+  *[_type == "testimonial"] | order(order asc) {
+    _id,
+    name,
+    company,
+    quote,
+    avatar,
+    rating
+  }
+`)
+
+export const allClientLogosQuery = defineQuery(`
+  *[_type == "clientLogo"] | order(order asc) {
+    _id,
+    name,
+    logo,
+    url
+  }
+`)
+
+export const projectSlugs = defineQuery(`
+  *[_type == "project" && defined(slug.current)]
+  {"slug": slug.current}
+`)
+
+export const serviceSlugs = defineQuery(`
+  *[_type == "service" && defined(slug.current)]
+  {"slug": slug.current}
+`)

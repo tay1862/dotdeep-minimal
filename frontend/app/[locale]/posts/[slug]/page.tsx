@@ -8,6 +8,7 @@ import {MorePosts} from '@/app/components/Posts'
 import PortableText from '@/app/components/PortableText'
 import Image from '@/app/components/SanityImage'
 import {sanityFetch} from '@/sanity/lib/live'
+import {client} from '@/sanity/lib/client'
 import {postPagesSlugs, postQuery} from '@/sanity/lib/queries'
 import {resolveOpenGraphImage} from '@/sanity/lib/utils'
 
@@ -20,12 +21,7 @@ type Props = {
  * Learn more: https://nextjs.org/docs/app/api-reference/functions/generate-static-params
  */
 export async function generateStaticParams() {
-  const {data} = await sanityFetch({
-    query: postPagesSlugs,
-    // Use the published perspective in generateStaticParams
-    perspective: 'published',
-    stega: false,
-  })
+  const data = await client.fetch(postPagesSlugs)
   return data
 }
 

@@ -1,7 +1,7 @@
 import {MetadataRoute} from 'next'
 import {sanityFetch} from '@/sanity/lib/live'
 import {sitemapData} from '@/sanity/lib/queries'
-import {headers} from 'next/headers'
+import {locales} from '@/i18n/config'
 
 /**
  * This file creates a sitemap (sitemap.xml) for the application. Learn more about sitemaps in Next.js here: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap
@@ -12,48 +12,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const allPostsAndPages = await sanityFetch({
     query: sitemapData,
   })
-  const headersList = await headers()
   const sitemap: MetadataRoute.Sitemap = []
-  const domain: string = headersList.get('host') as string
-  sitemap.push({
-    url: domain as string,
-    lastModified: new Date(),
-    priority: 1,
-    changeFrequency: 'monthly',
-  })
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '')
+
+  for (const locale of locales) {
+    sitemap.push({
+      url: `${siteUrl}/${locale}`,
+      lastModified: new Date(),
+      priority: locale === 'en' ? 1 : 0.9,
+      changeFrequency: 'weekly',
+    })
+  }
 
   if (allPostsAndPages != null && allPostsAndPages.data.length != 0) {
-    let priority: number
-    let changeFrequency:
-      | 'monthly'
-      | 'always'
-      | 'hourly'
-      | 'daily'
-      | 'weekly'
-      | 'yearly'
-      | 'never'
-      | undefined
-    let url: string
-
     for (const p of allPostsAndPages.data) {
-      switch (p._type) {
-        case 'page':
-          priority = 0.8
-          changeFrequency = 'monthly'
-          url = `${domain}/${p.slug}`
-          break
-        case 'post':
-          priority = 0.5
-          changeFrequency = 'never'
-          url = `${domain}/posts/${p.slug}`
-          break
+      for (const locale of locales) {
+        if (p._type === 'page') {
+          sitemap.push({
+            lastModified: p._updatedAt || new Date(),
+            priority: 0.7,
+            changeFrequency: 'monthly',
+            url: `${siteUrl}/${locale}/${p.slug}`,
+          })
+        }
+
+        if (p._type === 'post') {
+          sitemap.push({
+            lastModified: p._updatedAt || new Date(),
+            priority: 0.6,
+            changeFrequency: 'weekly',
+            url: `${siteUrl}/${locale}/posts/${p.slug}`,
+          })
+        }
       }
-      sitemap.push({
-        lastModified: p._updatedAt || new Date(),
-        priority,
-        changeFrequency,
-        url,
-      })
     }
   }
 
