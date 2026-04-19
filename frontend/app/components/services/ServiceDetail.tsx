@@ -51,8 +51,8 @@ export default function ServiceDetail({service, locale}: {service: ServiceData; 
         </ScrollReveal>
 
         <ScrollReveal>
-          <h1 className="text-fluid-2xl lg:text-fluid-3xl font-display font-bold mb-4">{title}</h1>
-          <p className="text-lg text-[var(--on-surface-muted)] leading-relaxed mb-10">
+          <h1 className={`text-fluid-2xl lg:text-fluid-3xl font-display font-bold mb-4 ${locale === 'lo' ? 'font-lao' : ''}`}>{title}</h1>
+          <p className={`text-lg text-[var(--on-surface-muted)] leading-relaxed mb-10 ${locale === 'lo' ? 'font-lao' : ''}`}>
             {service.shortDescription?.[l] || service.shortDescription?.en || ''}
           </p>
         </ScrollReveal>

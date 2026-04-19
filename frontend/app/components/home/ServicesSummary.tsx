@@ -41,7 +41,7 @@ export default function ServicesSummary({
             <p className="text-sm font-medium text-brand-500 uppercase tracking-wider mb-2">
               {t('title')}
             </p>
-            <h2 className="text-fluid-2xl font-display font-bold">
+            <h2 className={`text-fluid-2xl font-display font-bold ${locale === 'lo' ? 'font-lao' : ''}`}>
               {heading?.[l] || heading?.en || tSections('ourServices')}
             </h2>
           </div>

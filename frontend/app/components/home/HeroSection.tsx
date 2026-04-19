@@ -46,7 +46,7 @@ export default function HeroSection({data, locale}: {data: HeroData | null; loca
             </ScrollReveal>
 
             <ScrollReveal delay={100}>
-              <h1 className="text-fluid-3xl lg:text-fluid-4xl font-display font-bold leading-[1.08] tracking-tight mb-6">
+              <h1 className={`text-fluid-3xl lg:text-fluid-4xl font-bold leading-[1.08] tracking-tight mb-6 ${locale === 'lo' ? 'font-lao' : 'font-display'}`}>
                 {heading.split(' ').map((word, i, arr) =>
                   i === arr.length - 1 ? (
                     <span key={i} className="text-brand-500">{word}</span>
@@ -58,7 +58,7 @@ export default function HeroSection({data, locale}: {data: HeroData | null; loca
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
-              <p className="text-lg lg:text-xl text-[var(--on-surface-muted)] max-w-lg mb-8 leading-relaxed">
+              <p className={`text-lg lg:text-xl text-[var(--on-surface-muted)] max-w-lg mb-8 leading-relaxed ${locale === 'lo' ? 'font-lao' : ''}`}>
                 {subheading}
               </p>
             </ScrollReveal>

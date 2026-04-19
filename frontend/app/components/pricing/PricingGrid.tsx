@@ -28,7 +28,7 @@ export default function PricingGrid({items, locale}: {items: PricingItem[]; loca
       <ScrollReveal>
         <div className="text-center mb-14">
           <p className="text-sm font-medium text-brand-500 uppercase tracking-wider mb-2">{t('title')}</p>
-          <h1 className="text-fluid-2xl font-display font-bold mb-3">{t('subtitle')}</h1>
+          <h1 className={`text-fluid-2xl font-display font-bold mb-3 ${locale === 'lo' ? 'font-lao' : ''}`}>{t('subtitle')}</h1>
         </div>
       </ScrollReveal>
 

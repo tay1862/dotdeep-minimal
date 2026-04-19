@@ -53,7 +53,7 @@ export default function AboutContent({
             <p className="text-sm font-medium text-brand-500 uppercase tracking-wider mb-2">
               {t('title')}
             </p>
-            <h1 className="text-fluid-2xl lg:text-fluid-3xl font-display font-bold">
+            <h1 className={`text-fluid-2xl lg:text-fluid-3xl font-display font-bold ${locale === 'lo' ? 'font-lao' : ''}`}>
               {about?.heading?.[l] || about?.heading?.en || t('title')}
             </h1>
           </div>

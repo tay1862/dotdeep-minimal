@@ -117,13 +117,18 @@
     line-height: 1.8;
   }
 
+  [data-locale='lo'] {
+    font-family: var(--font-hinsiew), var(--font-noto-lao), var(--font-body), system-ui, sans-serif;
+  }
+
   [data-locale='lo'] h1,
   [data-locale='lo'] h2,
   [data-locale='lo'] h3,
   [data-locale='lo'] h4,
   [data-locale='lo'] h5,
   [data-locale='lo'] h6,
-  [data-locale='lo'] .font-display {
+  [data-locale='lo'] .font-display,
+  [data-locale='lo'] .font-lao {
     font-family: var(--font-hinsiew), var(--font-noto-lao), var(--font-body), system-ui, sans-serif;
     letter-spacing: 0;
   }
