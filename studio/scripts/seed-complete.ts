@@ -138,7 +138,7 @@ const homePage = {
   },
   ctaText: {
     _type: 'localizedString',
-    en: 'Have a project in mind? We'd love to hear about it. Get in touch and let's bring your vision to life.',
+    en: "Have a project in mind? We would love to hear about it. Get in touch and lets bring your vision to life.",
     th: 'มีโปรเจคในใจอยู่ใช่ไหม? เรายินดีรับฟัง ติดต่อเราและมาทำให้วิสัยทัศน์ของคุณเป็นจริง',
     lo: 'ມີໂປຣເຈັກໃນໃຈບໍ່? ພວກເຮົາຍິນດີຮັບຟັງ ຕິດຕໍ່ພວກເຮົາແລະມາເຮັດໃຫ້ວິໄສທັດຂອງທ່ານເປັນຈິງ',
   },
