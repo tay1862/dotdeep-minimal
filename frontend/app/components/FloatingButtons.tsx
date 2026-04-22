@@ -2,20 +2,38 @@
 
 import {useState} from 'react'
 
-export default function FloatingButtons() {
+interface SiteSettings {
+  socialLinks?: {
+    whatsapp?: string | null
+    facebook?: string | null
+    line?: string | null
+  } | null
+}
+
+export default function FloatingButtons({settings}: {settings?: SiteSettings | null}) {
   const [open, setOpen] = useState(false)
 
+  const whatsapp = settings?.socialLinks?.whatsapp
+  const messenger = settings?.socialLinks?.facebook
+  const line = settings?.socialLinks?.line
+
+  const hasAny = whatsapp || messenger || line
+  if (!hasAny) return null
+
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5">
       {/* Expanded buttons */}
-      {open && (
-        <div className="flex flex-col gap-2 animate-in slide-in-from-bottom-4 fade-in duration-200">
-          {/* WhatsApp */}
+      <div
+        className={`flex flex-col gap-2 transition-all duration-300 ${
+          open ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}
+      >
+        {whatsapp && (
           <a
-            href="https://wa.me/8562012345678"
+            href={`https://wa.me/${whatsapp.replace(/\D/g, '')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2.5 text-white text-sm font-medium shadow-lg hover:brightness-110 transition-all"
+            className="flex items-center gap-2.5 rounded-full bg-[#25D366] px-4 py-2.5 text-white text-sm font-semibold shadow-lg hover:brightness-110 transition-all"
             aria-label="WhatsApp"
           >
             <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
@@ -24,13 +42,14 @@ export default function FloatingButtons() {
             </svg>
             WhatsApp
           </a>
+        )}
 
-          {/* Messenger */}
+        {messenger && (
           <a
-            href="https://m.me/dotdeep"
+            href={`https://m.me/${messenger.replace(/.*facebook\.com\//i, '').replace(/\//g, '')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-full bg-[#006AFF] px-4 py-2.5 text-white text-sm font-medium shadow-lg hover:brightness-110 transition-all"
+            className="flex items-center gap-2.5 rounded-full bg-[#006AFF] px-4 py-2.5 text-white text-sm font-semibold shadow-lg hover:brightness-110 transition-all"
             aria-label="Messenger"
           >
             <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
@@ -38,21 +57,37 @@ export default function FloatingButtons() {
             </svg>
             Messenger
           </a>
-        </div>
-      )}
+        )}
+
+        {line && (
+          <a
+            href={`https://line.me/ti/p/${line}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2.5 rounded-full bg-[#06C755] px-4 py-2.5 text-white text-sm font-semibold shadow-lg hover:brightness-110 transition-all"
+            aria-label="LINE"
+          >
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+            </svg>
+            LINE
+          </a>
+        )}
+      </div>
 
       {/* Toggle FAB */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-center w-14 h-14 rounded-full bg-brand-500 text-white shadow-xl hover:bg-brand-600 transition-all active:scale-95"
+        className={`flex items-center justify-center w-14 h-14 rounded-full bg-brand-500 text-white shadow-xl hover:bg-brand-600 transition-all active:scale-95 ${open ? 'rotate-45' : ''}`}
         aria-label="Contact options"
+        style={{transition: 'transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background-color 0.2s'}}
       >
         {open ? (
-          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <path d="M18 6 6 18M6 6l12 12" />
           </svg>
         ) : (
-          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         )}

@@ -3,8 +3,8 @@
 import {useState} from 'react'
 import {useTranslations} from 'next-intl'
 import Link from 'next/link'
-import Image from 'next/image'
 import ScrollReveal from '@/app/components/ScrollReveal'
+import SanityImage from '@/app/components/SanityImage'
 
 interface Project {
   _id: string
@@ -73,11 +73,12 @@ export default function GalleryGrid({projects, locale}: {projects: Project[]; lo
             >
               <div className="relative aspect-[4/3] bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
                 {project.coverImage?.asset?._ref ? (
-                  <Image
-                    src={`https://cdn.sanity.io/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${project.coverImage.asset._ref.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`}
+                  <SanityImage
+                    source={project.coverImage}
                     alt={project.title?.[l] || project.title?.en || ''}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-neutral-400">

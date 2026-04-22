@@ -11,6 +11,8 @@ import DraftModeToast from '@/app/components/DraftModeToast'
 import {SanityLive} from '@/sanity/lib/live'
 import {handleError} from '@/app/client-utils'
 import {locales} from '@/i18n/config'
+import {sanityFetch} from '@/sanity/lib/live'
+import {siteSettingsQuery} from '@/sanity/lib/queries'
 
 export default async function LocaleLayout({
   children,
@@ -23,8 +25,8 @@ export default async function LocaleLayout({
   if (!hasLocale(locales, locale)) notFound()
 
   const {isEnabled: isDraftMode} = await draftMode()
-
   const messages = (await import(`@/i18n/messages/${locale}.json`)).default
+  const {data: settings} = await sanityFetch({query: siteSettingsQuery})
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
@@ -39,8 +41,8 @@ export default async function LocaleLayout({
         <SanityLive onError={handleError} />
         <Header locale={locale} />
         <main className="flex-1 pt-20">{children}</main>
-        <Footer locale={locale} />
-        <FloatingButtons />
+        <Footer locale={locale} settings={settings} />
+        <FloatingButtons settings={settings} />
       </div>
     </NextIntlClientProvider>
   )

@@ -1,5 +1,7 @@
 import {getTranslations} from 'next-intl/server'
 import ContactForm from '@/app/components/contact/ContactForm'
+import {sanityFetch} from '@/sanity/lib/live'
+import {siteSettingsQuery} from '@/sanity/lib/queries'
 
 export async function generateMetadata({params}: {params: Promise<{locale: string}>}) {
   const {locale} = await params
@@ -12,11 +14,12 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
 
 export default async function ContactPage({params}: {params: Promise<{locale: string}>}) {
   const {locale} = await params
+  const {data: settings} = await sanityFetch({query: siteSettingsQuery})
 
   return (
     <section className="py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <ContactForm locale={locale} />
+        <ContactForm locale={locale} settings={settings} />
       </div>
     </section>
   )

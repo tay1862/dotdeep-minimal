@@ -63,8 +63,28 @@ import { getHeadingClasses } from '@/app/utils/locale'
 
 ## Vercel Deployment Checklist
 
-- [ ] Set `SANITY_STUDIO_PREVIEW_URL=https://dotdeep.vercel.app` in Vercel dashboard
-- [ ] Set `NEXT_PUBLIC_SITE_URL=https://dotdeep.vercel.app` in Vercel dashboard
-- [ ] Verify Sanity API tokens are set correctly
+### Frontend Environment Variables (Vercel Dashboard)
+- [ ] `NEXT_PUBLIC_SANITY_PROJECT_ID=u0fnsyxd`
+- [ ] `NEXT_PUBLIC_SANITY_DATASET=production`
+- [ ] `NEXT_PUBLIC_SITE_URL=https://dotdeep.vercel.app`
+- [ ] `SANITY_API_READ_TOKEN=<your_read_token>` (from .env.local)
+- [ ] `SANITY_API_WRITE_TOKEN=<your_write_token>` (from .env.local)
+- [ ] `RESEND_API_KEY=<your_resend_key>` (from .env.local)
+- [ ] `CONTACT_EMAIL=totayk186@gmail.com`
+
+### Studio Environment Variables (Vercel Dashboard - if deploying studio)
+- [ ] `SANITY_STUDIO_PROJECT_ID=u0fnsyxd`
+- [ ] `SANITY_STUDIO_DATASET=production`
+- [ ] `SANITY_STUDIO_PREVIEW_URL=https://dotdeep.vercel.app`
+
+### Vercel Project Settings
+- [ ] Root Directory: `frontend`
+- [ ] Framework Preset: Next.js
+- [ ] Node Version: 18.x or higher
+
+### Post-Deployment
 - [ ] Test presentation tool visual editing from Sanity Studio
 - [ ] Verify all Lao text renders with Hinsiew font
+- [ ] Test contact form email delivery
+- [ ] Verify all 3 locales (en, th, lo) work correctly
+- [ ] Check dark mode toggle functionality
