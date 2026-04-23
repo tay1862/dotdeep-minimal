@@ -147,23 +147,23 @@ npx sanity manage
 คลิก **"Environment Variables"** แล้วเพิ่ม:
 
 ```env
-NEXT_PUBLIC_SANITY_PROJECT_ID=u0fnsyxd
+NEXT_PUBLIC_SANITY_PROJECT_ID=<your-sanity-project-id>
 NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SITE_URL=https://dotdeep-minimal.vercel.app
-SANITY_STUDIO_PREVIEW_URL=https://dotdeep-minimal.vercel.app
-SANITY_API_READ_TOKEN=skGNmnbZgONKVtcO4FhibSEC7z9nus1236VHljPuPzIaNlDW7ku5zHH3YD5mau86ctYcZHW1WggTazJusudKvERBEZLHXdY5FNjZBiaLwkIeyKiOwzlHywuFkVklAsH5CZ71PgXmPQGihhvedfUZmuZyUPdyBbA1cK919vt4vHTqOefypsNL
-SANITY_API_WRITE_TOKEN=skVtpIQ58rWK7ieil7yxZJwZhSP1G8Sit4QJwxpPPJSb2NJsDI9grxmLIRNWrv81pw52eHyHahYF1WJOIqXq2RwkuUO2Gmw18HHZWUA56jyzuNxf0JXzeXmZ60UY9ZtVGPG8qmi8nrOP3NJqxigomPm3FM23VP49mI6wjaAnLjQmWiUsD3Dc
-RESEND_API_KEY=re_8Fdq1Td9_JJvc7HbMbxUeL1uu4PibW7bP
-CONTACT_EMAIL=dotdeepdesign@gmail.com
+NEXT_PUBLIC_SITE_URL=https://your-project.vercel.app
+SANITY_STUDIO_PREVIEW_URL=https://your-project.vercel.app
+SANITY_API_READ_TOKEN=<your-sanity-read-token>
+SANITY_API_WRITE_TOKEN=<your-sanity-write-token>
+RESEND_API_KEY=<your-resend-api-key>
+CONTACT_EMAIL=hello@example.com
 ```
 
-**สำคัญ**: เปลี่ยน `NEXT_PUBLIC_SITE_URL` เป็น URL จริงของคุณหลัง deploy เสร็จ
+**สำคัญ**: ใช้ค่าใหม่จาก provider ของคุณเองเท่านั้น และถ้า token ใดเคยถูกเปิดเผย ต้อง rotate ก่อน deploy
 
 ### 3.5 Deploy
 
 1. คลิก **"Deploy"**
 2. รอ 2-3 นาที
-3. ✅ เว็บจะ live ที่ `https://dotdeep-minimal.vercel.app`
+3. ✅ เว็บจะ live ที่ `https://your-project.vercel.app`
 
 ---
 
@@ -174,8 +174,8 @@ CONTACT_EMAIL=dotdeepdesign@gmail.com
 1. ไปที่ Vercel Dashboard → Project Settings → Environment Variables
 2. แก้ไข:
    ```env
-   NEXT_PUBLIC_SITE_URL=https://dotdeep-minimal.vercel.app
-   SANITY_STUDIO_PREVIEW_URL=https://dotdeep-minimal.vercel.app
+   NEXT_PUBLIC_SITE_URL=https://your-project.vercel.app
+   SANITY_STUDIO_PREVIEW_URL=https://your-project.vercel.app
    ```
 3. คลิก **"Save"**
 4. ไปที่ **Deployments** → คลิก **"Redeploy"** บน deployment ล่าสุด
@@ -191,9 +191,9 @@ nano .env.local
 
 เปลี่ยนเป็น:
 ```env
-SANITY_STUDIO_PROJECT_ID="u0fnsyxd"
+SANITY_STUDIO_PROJECT_ID="<your-sanity-project-id>"
 SANITY_STUDIO_DATASET="production"
-SANITY_STUDIO_PREVIEW_URL="https://dotdeep-minimal.vercel.app"
+SANITY_STUDIO_PREVIEW_URL="https://your-project.vercel.app"
 ```
 
 Save และ redeploy studio:
@@ -413,7 +413,7 @@ git push origin main
 ## 🎉 ยินดีด้วย!
 
 เว็บของคุณ live แล้วที่:
-- **Frontend**: https://dotdeep-minimal.vercel.app
+- **Frontend**: https://your-project.vercel.app
 - **Studio**: https://dotdeep.sanity.studio
 
 ขั้นตอนต่อไป:
@@ -422,7 +422,7 @@ git push origin main
 3. แชร์เว็บกับลูกค้า
 4. รับ feedback และปรับปรุง
 
-**Need help?** ติดต่อ: dotdeepdesign@gmail.com
+**Need help?** ติดต่อ: <your-support-email>
 
 ---
 

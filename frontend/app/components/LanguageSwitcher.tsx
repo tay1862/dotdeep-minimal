@@ -1,5 +1,6 @@
 'use client'
 
+import {startTransition} from 'react'
 import {usePathname, useRouter} from 'next/navigation'
 import {locales, localeNames, type Locale} from '@/i18n/config'
 
@@ -10,7 +11,9 @@ export default function LanguageSwitcher({locale}: {locale: string}) {
   const switchLocale = (newLocale: Locale) => {
     const segments = pathname.split('/')
     segments[1] = newLocale
-    router.push(segments.join('/'))
+    startTransition(() => {
+      router.push(segments.join('/'))
+    })
   }
 
   return (
@@ -24,6 +27,9 @@ export default function LanguageSwitcher({locale}: {locale: string}) {
               ? 'bg-brand-500 text-white'
               : 'text-on-surface-muted hover:text-on-surface'
           }`}
+          aria-label={`Switch language to ${localeNames[loc]}`}
+          aria-pressed={locale === loc}
+          title={localeNames[loc]}
         >
           {loc.toUpperCase()}
         </button>

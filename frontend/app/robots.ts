@@ -1,13 +1,17 @@
 import {MetadataRoute} from 'next'
+import {getSiteOrigin} from '@/app/lib/urls'
 
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '')
+  const siteUrl = getSiteOrigin()
 
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-    },
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/api/draft-mode/'],
+      },
+    ],
     sitemap: `${siteUrl}/sitemap.xml`,
     host: siteUrl,
   }

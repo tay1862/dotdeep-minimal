@@ -20,27 +20,37 @@
     "stats": "By the Numbers",
     "cta": "Let's Work Together",
     "ctaDescription": "Have a project in mind? We'd love to hear about it.",
-    "getQuote": "Get a Quote"
+    "getQuote": "Get a Quote",
+    "readyBadge": "Ready to collaborate",
+    "viewPricing": "View Pricing"
   },
   "gallery": {
     "title": "Our Work",
+    "description": "Explore DotDeep Design projects across branding, websites, UI/UX, and motion work.",
     "all": "All",
     "graphic": "Graphic Design",
     "web": "Web Development",
     "uiux": "UI/UX Design",
     "video": "Video",
-    "viewProject": "View Project"
+    "viewProject": "View Project",
+    "visitSite": "Visit Site",
+    "watchVideo": "Watch Video",
+    "technologies": "Technologies",
+    "empty": "No projects found in this category."
   },
   "about": {
     "title": "About Us",
+    "description": "Learn about DotDeep Design, our story, vision, and the team behind the work.",
     "vision": "Vision",
     "mission": "Mission",
     "ourTeam": "Our Team",
-    "skills": "Technologies & Skills"
+    "skills": "Technologies & Skills",
+    "ourStory": "Our Story"
   },
   "contact": {
     "title": "Contact Us",
     "subtitle": "Let's start a conversation",
+    "intro": "We'd love to hear about your project. Reach out through the form or any of our channels below.",
     "name": "Your Name",
     "email": "Email Address",
     "phone": "Phone Number",
@@ -50,6 +60,12 @@
     "sending": "Sending...",
     "success": "Message sent! We'll get back to you soon.",
     "error": "Something went wrong. Please try again.",
+    "errorValidation": "Please check the required fields and try again.",
+    "errorRateLimit": "Too many attempts. Please wait a few minutes before trying again.",
+    "errorTooFast": "Submission was too fast. Please try again.",
+    "errorSpam": "Submission blocked. Please try again.",
+    "errorServiceUnavailable": "Contact form is temporarily unavailable. Please email us directly.",
+    "placeholderMessage": "Tell us about your project...",
     "whatsapp": "Chat on WhatsApp",
     "line": "LINE Official",
     "messenger": "Messenger"
@@ -58,29 +74,35 @@
     "title": "Our Services",
     "subtitle": "What we can do for you",
     "learnMore": "Learn More",
-    "startingFrom": "Starting from"
+    "startingFrom": "Starting from",
+    "included": "What's included",
+    "interested": "Interested in this service?"
   },
   "pricing": {
     "title": "Pricing",
     "subtitle": "Transparent pricing for quality work",
     "contactUs": "Contact for Quote",
-    "perProject": "per project"
+    "perProject": "per project",
+    "comingSoon": "Pricing packages coming soon."
   },
   "team": {
     "title": "Meet Our Team",
-    "subtitle": "The people behind DotDeep Design"
+    "subtitle": "The people behind DotDeep Design",
+    "comingSoon": "Team members coming soon."
   },
   "footer": {
     "tagline": "Crafting digital experiences from Laos to the world.",
     "quickLinks": "Quick Links",
     "getInTouch": "Get in Touch",
     "followUs": "Follow Us",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "madeIn": "Crafted in Vientiane"
   },
   "common": {
     "loading": "Loading...",
     "backToTop": "Back to Top",
     "readMore": "Read More",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "portfolioLabel": "Portfolio"
   }
 }

@@ -35,7 +35,7 @@ export default function PricingGrid({items, locale}: {items: PricingItem[]; loca
       {items.length === 0 ? (
         <ScrollReveal>
           <div className="text-center py-16">
-            <p className="text-lg text-[var(--on-surface-muted)] mb-6">Pricing packages coming soon.</p>
+            <p className="text-lg text-[var(--on-surface-muted)] mb-6">{t('comingSoon')}</p>
             <Link
               href={`/${locale}/contact`}
               className="inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 text-white px-7 py-3 font-medium transition-all"

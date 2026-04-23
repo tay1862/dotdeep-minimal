@@ -1,4 +1,6 @@
 import {getTranslations} from 'next-intl/server'
+
+import {buildPageMetadata} from '@/app/lib/metadata'
 import ContactForm from '@/app/components/contact/ContactForm'
 import {sanityFetch} from '@/sanity/lib/live'
 import {siteSettingsQuery} from '@/sanity/lib/queries'
@@ -6,10 +8,12 @@ import {siteSettingsQuery} from '@/sanity/lib/queries'
 export async function generateMetadata({params}: {params: Promise<{locale: string}>}) {
   const {locale} = await params
   const t = await getTranslations({locale, namespace: 'contact'})
-  return {
+  return buildPageMetadata({
+    locale,
+    pathname: '/contact',
     title: `${t('title')} — DotDeep Design`,
     description: t('subtitle'),
-  }
+  })
 }
 
 export default async function ContactPage({params}: {params: Promise<{locale: string}>}) {

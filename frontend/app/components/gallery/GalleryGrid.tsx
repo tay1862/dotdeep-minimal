@@ -22,6 +22,7 @@ const categories = ['all', 'graphic', 'web', 'uiux', 'video'] as const
 
 export default function GalleryGrid({projects, locale}: {projects: Project[]; locale: string}) {
   const t = useTranslations('gallery')
+  const tCommon = useTranslations('common')
   const l = locale as 'en' | 'th' | 'lo'
   const [active, setActive] = useState<string>('all')
 
@@ -39,7 +40,7 @@ export default function GalleryGrid({projects, locale}: {projects: Project[]; lo
     <>
       <ScrollReveal>
         <div className="text-center mb-12">
-          <p className="text-sm font-medium text-brand-500 uppercase tracking-wider mb-2">Portfolio</p>
+          <p className="text-sm font-medium text-brand-500 uppercase tracking-wider mb-2">{tCommon('portfolioLabel')}</p>
           <h1 className="text-fluid-2xl font-display font-bold">{t('title')}</h1>
         </div>
       </ScrollReveal>
@@ -56,6 +57,7 @@ export default function GalleryGrid({projects, locale}: {projects: Project[]; lo
                   ? 'bg-brand-500 text-white shadow-md'
                   : 'bg-neutral-100 dark:bg-neutral-800 text-[var(--on-surface-muted)] hover:bg-neutral-200 dark:hover:bg-neutral-700'
               }`}
+              aria-pressed={active === cat}
             >
               {catLabels[cat]}
             </button>
@@ -124,7 +126,7 @@ export default function GalleryGrid({projects, locale}: {projects: Project[]; lo
 
       {filtered.length === 0 && (
         <div className="text-center py-20 text-[var(--on-surface-muted)]">
-          <p className="text-lg">No projects found in this category.</p>
+          <p className="text-lg">{t('empty')}</p>
         </div>
       )}
     </>

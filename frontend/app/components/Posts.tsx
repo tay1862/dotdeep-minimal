@@ -8,7 +8,7 @@ import OnBoarding from '@/app/components/Onboarding'
 import Avatar from '@/app/components/Avatar'
 import {dataAttr} from '@/sanity/lib/utils'
 
-const Post = ({post}: {post: AllPostsQueryResult[number]}) => {
+const Post = ({post, locale}: {post: AllPostsQueryResult[number]; locale: string}) => {
   const {_id, title, slug, excerpt, date, author} = post
 
   return (
@@ -17,7 +17,7 @@ const Post = ({post}: {post: AllPostsQueryResult[number]}) => {
       key={_id}
       className="border border-gray-200 rounded-sm p-6 bg-gray-50 flex flex-col justify-between transition-colors hover:bg-white relative"
     >
-      <Link className="hover:text-brand underline transition-colors" href={`/posts/${slug}`}>
+      <Link className="hover:text-brand underline transition-colors" href={`/${locale}/posts/${slug}`}>
         <span className="absolute inset-0 z-10" />
       </Link>
       <div>
@@ -55,7 +55,15 @@ const Posts = ({
   </div>
 )
 
-export const MorePosts = async ({skip, limit}: {skip: string; limit: number}) => {
+export const MorePosts = async ({
+  skip,
+  limit,
+  locale,
+}: {
+  skip: string
+  limit: number
+  locale: string
+}) => {
   const {data} = await sanityFetch({
     query: morePostsQuery,
     params: {skip, limit},
@@ -68,7 +76,7 @@ export const MorePosts = async ({skip, limit}: {skip: string; limit: number}) =>
   return (
     <Posts heading={`Recent Posts (${data?.length})`}>
       {data?.map((post: AllPostsQueryResult[number]) => (
-        <Post key={post._id} post={post} />
+        <Post key={post._id} post={post} locale={locale} />
       ))}
     </Posts>
   )
@@ -87,7 +95,7 @@ export const AllPosts = async () => {
       subHeading={`${data.length === 1 ? 'This blog post is' : `These ${data.length} blog posts are`} populated from your Sanity Studio.`}
     >
       {data.map((post: AllPostsQueryResult[number]) => (
-        <Post key={post._id} post={post} />
+        <Post key={post._id} post={post} locale="en" />
       ))}
     </Posts>
   )

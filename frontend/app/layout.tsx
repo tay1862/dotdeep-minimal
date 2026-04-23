@@ -2,10 +2,14 @@ import './globals.css'
 
 import {SpeedInsights} from '@vercel/speed-insights/next'
 import type {Metadata} from 'next'
+import Script from 'next/script'
 import localFont from 'next/font/local'
 import {Noto_Sans_Lao, Noto_Sans_Thai} from 'next/font/google'
+import {getLocale} from 'next-intl/server'
 import {toPlainText} from 'next-sanity'
 
+import {buildRootRedirectAlternates} from '@/app/lib/metadata'
+import {getSiteOrigin, sanitizeExternalUrl} from '@/app/lib/urls'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch} from '@/sanity/lib/live'
 import {settingsQuery} from '@/sanity/lib/queries'
@@ -21,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
   })
   const title = settings?.title || demo.title
   const description = settings?.description || demo.description
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL
+  const siteUrl = getSiteOrigin()
 
   const ogImage = resolveOpenGraphImage(settings?.ogImage)
   let metadataBase: URL | undefined = undefined
@@ -29,8 +33,8 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase = settings?.ogImage?.metadataBase
       ? new URL(settings.ogImage.metadataBase)
       : siteUrl
-        ? new URL(siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`)
-      : undefined
+        ? new URL(siteUrl)
+        : undefined
   } catch {
     // ignore
   }
@@ -42,6 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: toPlainText(description),
     applicationName: title,
+    alternates: buildRootRedirectAlternates('/'),
     robots: {
       index: true,
       follow: true,
@@ -57,11 +62,21 @@ export async function generateMetadata(): Promise<Metadata> {
       shortcut: ['/favicon.ico'],
       apple: [{url: '/icon.png'}],
     },
+    keywords: [
+      'DotDeep Design',
+      'design studio',
+      'web development',
+      'graphic design',
+      'UI UX',
+      'Laos',
+      'Vientiane',
+    ],
     openGraph: {
       type: 'website',
       siteName: title,
       title,
       description: toPlainText(description),
+      url: siteUrl,
       images: ogImage ? [ogImage] : [],
     },
     twitter: {
@@ -125,26 +140,54 @@ const notoSansLao = Noto_Sans_Lao({
   display: 'swap',
 })
 
-export default function RootLayout({children}: {children: React.ReactNode}) {
+export default async function RootLayout({children}: {children: React.ReactNode}) {
+  const locale = await getLocale()
+  const {data: settings} = await sanityFetch({
+    query: settingsQuery,
+    stega: false,
+  })
+  const siteUrl = getSiteOrigin()
+  const sameAs = [
+    settings?.socialLinks?.facebook,
+    settings?.socialLinks?.instagram,
+    settings?.socialLinks?.tiktok,
+    settings?.socialLinks?.linkedin,
+  ].flatMap((value) => {
+    const url = sanitizeExternalUrl(value)
+    return url ? [url] : []
+  })
+  const schemaGraph = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        name: settings?.title || demo.title,
+        url: siteUrl,
+        description: toPlainText(settings?.description || demo.description),
+        email: settings?.contactEmail || undefined,
+        telephone: settings?.contactPhone || undefined,
+        sameAs: sameAs.length ? sameAs : undefined,
+      },
+      {
+        '@type': 'WebSite',
+        name: settings?.title || demo.title,
+        url: siteUrl,
+        inLanguage: ['en', 'th', 'lo'],
+      },
+    ],
+  }
+
   return (
     <html
+      lang={locale}
       suppressHydrationWarning
       className={`${generalSans.variable} ${satoshi.variable} ${hinsiew.variable} ${notoSansThai.variable} ${notoSansLao.variable}`}
     >
       <head>
+        <Script src="/theme.js" strategy="beforeInteractive" />
         <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch(e) {}
-              })();
-            `,
-          }}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{__html: JSON.stringify(schemaGraph)}}
         />
       </head>
       <body className="bg-surface text-on-surface font-body antialiased">

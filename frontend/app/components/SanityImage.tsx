@@ -1,11 +1,10 @@
 import Image from 'next/image'
-import {createImageUrlBuilder} from '@sanity/image-url'
-import {dataset, projectId} from '@/sanity/lib/api'
+import type {ImageUrlBuilderOptions, SanityImageSource} from '@sanity/image-url'
 
-const builder = createImageUrlBuilder({projectId: projectId || '', dataset: dataset || ''})
+import {urlForImage} from '@/sanity/lib/utils'
 
 interface SanityImageProps {
-  source?: {asset?: {_ref?: string}} | null
+  source?: SanityImageSource | null
   alt: string
   fill?: boolean
   width?: number
@@ -14,6 +13,7 @@ interface SanityImageProps {
   priority?: boolean
   sizes?: string
   quality?: number
+  fit?: ImageUrlBuilderOptions['fit']
 }
 
 export default function SanityImage({
@@ -26,14 +26,25 @@ export default function SanityImage({
   priority,
   sizes,
   quality = 85,
+  fit = 'max',
 }: SanityImageProps) {
-  if (!source?.asset?._ref) return null
+  if (!source) return null
 
-  const url = builder
-    .image(source)
+  const imageBuilder = urlForImage(source)
     .auto('format')
     .quality(quality)
-    .url()
+
+  if (!fill && width) {
+    imageBuilder.width(width)
+  }
+
+  if (!fill && height) {
+    imageBuilder.height(height)
+  }
+
+  imageBuilder.fit(fit)
+
+  const url = imageBuilder.url()
 
   if (fill) {
     return (

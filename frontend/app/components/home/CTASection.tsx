@@ -45,7 +45,7 @@ export default function CTASection({data, locale}: {data: CTAData | null; locale
               <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm px-4 py-1.5 mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-300 animate-pulse" />
                 <span className="text-xs font-semibold uppercase tracking-widest text-white/80">
-                  {locale === 'lo' ? 'ພ້ອມຮ່ວມງານ' : locale === 'th' ? 'พร้อมร่วมงาน' : 'Ready to collaborate'}
+                  {t('readyBadge')}
                 </span>
               </div>
 
@@ -70,7 +70,7 @@ export default function CTASection({data, locale}: {data: CTAData | null; locale
                   href={`/${locale}/pricing`}
                   className="inline-flex items-center gap-2 rounded-full border border-white/30 text-white px-7 py-3.5 font-medium hover:bg-white/10 transition-all backdrop-blur-sm"
                 >
-                  {locale === 'lo' ? 'ເບິ່ງລາຄາ' : locale === 'th' ? 'ดูราคา' : 'View Pricing'}
+                  {t('viewPricing')}
                 </Link>
               </div>
             </div>

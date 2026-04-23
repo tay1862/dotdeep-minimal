@@ -28,6 +28,14 @@ export const homePage = defineType({
       title: 'Hero CTA Link',
       type: 'string',
       description: 'e.g. "/gallery" or "/contact"',
+      validation: (rule) =>
+        rule.custom((value) => {
+          if (!value) return true
+
+          return /^\/(?!\/)/.test(value)
+            ? true
+            : 'Use a relative path that starts with a single slash, for example /gallery'
+        }),
     }),
     defineField({
       name: 'heroImage',

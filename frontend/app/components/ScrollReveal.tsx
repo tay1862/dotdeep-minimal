@@ -2,6 +2,8 @@
 
 import {useEffect, useRef, type ReactNode} from 'react'
 
+import useReducedMotion from '@/app/components/useReducedMotion'
+
 interface ScrollRevealProps {
   children: ReactNode
   className?: string
@@ -10,15 +12,22 @@ interface ScrollRevealProps {
 
 export default function ScrollReveal({children, className = '', delay = 0}: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
 
+    if (prefersReducedMotion) {
+      el.classList.add('revealed')
+      return
+    }
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => el.classList.add('revealed'), delay)
+          timeoutId = setTimeout(() => el.classList.add('revealed'), delay)
           observer.unobserve(el)
         }
       },
@@ -26,8 +35,13 @@ export default function ScrollReveal({children, className = '', delay = 0}: Scro
     )
 
     observer.observe(el)
-    return () => observer.disconnect()
-  }, [delay])
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      observer.disconnect()
+    }
+  }, [delay, prefersReducedMotion])
 
   return (
     <div ref={ref} className={`reveal ${className}`}>

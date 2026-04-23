@@ -1,18 +1,31 @@
 'use client'
 
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
+
+function getCurrentTheme() {
+  if (typeof document === 'undefined') {
+    return false
+  }
+
+  if (document.documentElement.classList.contains('dark')) {
+    return true
+  }
+
+  if (document.documentElement.classList.contains('light')) {
+    return false
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+}
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(false)
-
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains('dark'))
-  }, [])
+  const [dark, setDark] = useState(getCurrentTheme)
 
   const toggle = () => {
-    const next = !dark
+    const next = !getCurrentTheme()
     setDark(next)
     document.documentElement.classList.toggle('dark', next)
+    document.documentElement.classList.toggle('light', !next)
     localStorage.setItem('theme', next ? 'dark' : 'light')
   }
 
@@ -20,7 +33,8 @@ export default function ThemeToggle() {
     <button
       onClick={toggle}
       className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-      aria-label="Toggle theme"
+      aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
+      aria-pressed={dark}
     >
       {dark ? (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

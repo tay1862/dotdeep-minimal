@@ -29,11 +29,10 @@ export default function CustomPortableText({
         return (
           <figure className="my-8">
             <Image
-              id={value.asset._ref}
+              source={value}
               alt={value.alt || ''}
               width={672}
-              crop={value.crop}
-              mode="cover"
+              fit="crop"
               className="rounded-sm"
             />
           </figure>

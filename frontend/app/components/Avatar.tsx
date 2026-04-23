@@ -24,14 +24,12 @@ export default function Avatar({person, date, small = false}: Props) {
       {picture?.asset?._ref ? (
         <div className={`${small ? 'h-6 w-6 mr-2' : 'h-9 w-9 mr-4'}`}>
           <Image
-            id={picture.asset._ref}
+            source={picture}
             alt={picture?.alt || ''}
             className="h-full rounded-full"
             height={small ? 32 : 48}
             width={small ? 32 : 48}
-            hotspot={picture.hotspot}
-            crop={picture.crop}
-            mode="cover"
+            fit="crop"
           />
         </div>
       ) : (

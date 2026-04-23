@@ -1,4 +1,5 @@
 import {Link} from '@/sanity.types'
+import {buildLocalePath, sanitizeExternalUrl} from '@/app/lib/urls'
 import {dataset, projectId, studioUrl} from '@/sanity/lib/api'
 import {createDataAttribute, CreateDataAttributeProps} from 'next-sanity'
 import {createImageUrlBuilder, type SanityImageSource} from '@sanity/image-url'
@@ -11,7 +12,7 @@ const builder = createImageUrlBuilder({
 
 // Create an image URL builder using the client
 // Export a function that can be used to get image URLs
-function urlForImage(source: SanityImageSource) {
+export function urlForImage(source: SanityImageSource) {
   return builder.image(source)
 }
 
@@ -27,25 +28,27 @@ export function resolveOpenGraphImage(
 }
 
 // Depending on the type of link, we need to fetch the corresponding page, post, or URL.  Otherwise return null.
-export function linkResolver(link: Link | DereferencedLink | undefined) {
+export function linkResolver(
+  link: Link | DereferencedLink | undefined,
+  locale = 'en',
+) {
   if (!link) return null
 
-  // If linkType is not set but href is, lets set linkType to "href".  This comes into play when pasting links into the portable text editor because a link type is not assumed.
-  if (!link.linkType && link.href) {
-    link.linkType = 'href'
-  }
+  const linkType = link.linkType || (link.href ? 'href' : undefined)
 
-  switch (link.linkType) {
+  switch (linkType) {
     case 'href':
-      return link.href || null
+      return sanitizeExternalUrl(link.href) || null
     case 'page':
       if (link?.page && typeof link.page === 'string') {
-        return `/${link.page}`
+        return buildLocalePath(locale, `/${link.page}`)
       }
+      return null
     case 'post':
       if (link?.post && typeof link.post === 'string') {
-        return `/posts/${link.post}`
+        return buildLocalePath(locale, `/posts/${link.post}`)
       }
+      return null
     default:
       return null
   }

@@ -1,7 +1,8 @@
 'use client'
 
 import {useEffect, useRef, useState} from 'react'
-import ScrollReveal from '@/app/components/ScrollReveal'
+
+import useReducedMotion from '@/app/components/useReducedMotion'
 
 interface Stat {
   value?: string | null
@@ -10,7 +11,10 @@ interface Stat {
 }
 
 function AnimatedStat({value, suffix, label}: {value: string; suffix?: string | null; label: string}) {
-  const [displayed, setDisplayed] = useState('0')
+  const numberValue = parseFloat(value.replace(/[^0-9.]/g, ''))
+  const prefersReducedMotion = useReducedMotion()
+  const initialValue = Number.isNaN(numberValue) ? value : prefersReducedMotion ? value : '0'
+  const [displayed, setDisplayed] = useState(initialValue)
   const [started, setStarted] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -27,20 +31,29 @@ function AnimatedStat({value, suffix, label}: {value: string; suffix?: string | 
 
   useEffect(() => {
     if (!started) return
-    const num = parseFloat(value.replace(/[^0-9.]/g, ''))
-    if (isNaN(num)) { setDisplayed(value); return }
+    if (Number.isNaN(numberValue) || prefersReducedMotion) {
+      return
+    }
 
     const duration = 1600
     const start = performance.now()
+    let frameId = 0
     const step = (now: number) => {
       const progress = Math.min((now - start) / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
-      const current = num % 1 === 0 ? Math.floor(eased * num) : (eased * num).toFixed(1)
+      const current =
+        numberValue % 1 === 0
+          ? Math.floor(eased * numberValue)
+          : (eased * numberValue).toFixed(1)
       setDisplayed(String(current))
-      if (progress < 1) requestAnimationFrame(step)
+      if (progress < 1) {
+        frameId = requestAnimationFrame(step)
+      }
     }
-    requestAnimationFrame(step)
-  }, [started, value])
+    frameId = requestAnimationFrame(step)
+
+    return () => cancelAnimationFrame(frameId)
+  }, [numberValue, prefersReducedMotion, started])
 
   return (
     <div ref={ref} className="text-center group">

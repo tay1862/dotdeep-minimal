@@ -1,8 +1,11 @@
-'use client'
-
 import {useTranslations} from 'next-intl'
-import Image from 'next/image'
+import {type PortableTextBlock} from 'next-sanity'
+
+import PortableText from '@/app/components/PortableText'
+import SanityImage from '@/app/components/SanityImage'
 import ScrollReveal from '@/app/components/ScrollReveal'
+import {sanitizeExternalUrl} from '@/app/lib/urls'
+import {getLocalizedValue, type LocalizedPortableText} from '@/sanity/lib/localized'
 
 interface TeamMember {
   _id: string
@@ -20,16 +23,11 @@ interface TeamMember {
 
 interface AboutData {
   heading?: {en?: string; th?: string; lo?: string} | null
-  vision?: {en?: any; th?: any; lo?: any} | null
-  mission?: {en?: any; th?: any; lo?: any} | null
-  story?: {en?: any; th?: any; lo?: any} | null
+  vision?: LocalizedPortableText
+  mission?: LocalizedPortableText
+  story?: LocalizedPortableText
   storyImage?: {asset?: {_ref?: string}} | null
   techStack?: {name?: string; icon?: string; _key?: string}[] | null
-}
-
-function sanityImg(ref?: string) {
-  if (!ref) return ''
-  return `https://cdn.sanity.io/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${ref.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`
 }
 
 export default function AboutContent({
@@ -43,6 +41,9 @@ export default function AboutContent({
 }) {
   const t = useTranslations('about')
   const l = locale as 'en' | 'th' | 'lo'
+  const vision = getLocalizedValue(about?.vision, l)
+  const mission = getLocalizedValue(about?.mission, l)
+  const story = getLocalizedValue(about?.story, l)
 
   return (
     <div className="py-16 lg:py-24">
@@ -67,10 +68,12 @@ export default function AboutContent({
                 <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
               </div>
               <h2 className="text-xl font-display font-bold mb-3">{t('vision')}</h2>
-              <p className="text-[var(--on-surface-muted)] leading-relaxed">
-                {/* Simplified: would use PortableText for rich content */}
-                Vision content from Sanity CMS.
-              </p>
+              {vision ? (
+                <PortableText
+                  className="max-w-none prose-p:text-on-surface-muted prose-p:leading-relaxed"
+                  value={vision as PortableTextBlock[]}
+                />
+              ) : null}
             </div>
           </ScrollReveal>
 
@@ -80,30 +83,39 @@ export default function AboutContent({
                 <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
               </div>
               <h2 className="text-xl font-display font-bold mb-3">{t('mission')}</h2>
-              <p className="text-[var(--on-surface-muted)] leading-relaxed">
-                Mission content from Sanity CMS.
-              </p>
+              {mission ? (
+                <PortableText
+                  className="max-w-none prose-p:text-on-surface-muted prose-p:leading-relaxed"
+                  value={mission as PortableTextBlock[]}
+                />
+              ) : null}
             </div>
           </ScrollReveal>
         </div>
 
         {/* Story section with image */}
-        {about?.storyImage?.asset?._ref && (
+        {(about?.storyImage?.asset?._ref || story) && (
           <ScrollReveal>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
-                <Image
-                  src={sanityImg(about.storyImage.asset._ref)}
-                  alt="Our Story"
-                  fill
-                  className="object-cover"
-                />
+                {about?.storyImage?.asset?._ref ? (
+                  <SanityImage
+                    source={about.storyImage}
+                    alt={t('ourStory')}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                ) : null}
               </div>
               <div>
-                <h2 className="text-fluid-xl font-display font-bold mb-4">Our Story</h2>
-                <p className="text-[var(--on-surface-muted)] leading-relaxed">
-                  Story content from Sanity CMS.
-                </p>
+                <h2 className="text-fluid-xl font-display font-bold mb-4">{t('ourStory')}</h2>
+                {story ? (
+                  <PortableText
+                    className="max-w-none prose-p:text-on-surface-muted prose-p:leading-relaxed"
+                    value={story as PortableTextBlock[]}
+                  />
+                ) : null}
               </div>
             </div>
           </ScrollReveal>
@@ -146,11 +158,12 @@ export default function AboutContent({
                   <div className="group p-6 rounded-2xl border border-[var(--border-default)] hover:border-brand-300 hover:shadow-lg transition-all text-center">
                     <div className="relative w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 bg-neutral-100 dark:bg-neutral-800">
                       {member.picture?.asset?._ref ? (
-                        <Image
-                          src={sanityImg(member.picture.asset._ref)}
+                        <SanityImage
+                          source={member.picture}
                           alt={`${member.firstName || ''} ${member.lastName || ''}`}
                           fill
                           className="object-cover"
+                          sizes="96px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-neutral-400">
@@ -175,18 +188,18 @@ export default function AboutContent({
                     {/* Social links */}
                     {member.socialLinks && (
                       <div className="flex justify-center gap-2 mt-3">
-                        {member.socialLinks.facebook && (
-                          <a href={member.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="p-1.5 text-[var(--on-surface-muted)] hover:text-brand-500 transition-colors">
+                        {member.socialLinks.facebook && sanitizeExternalUrl(member.socialLinks.facebook) && (
+                          <a href={sanitizeExternalUrl(member.socialLinks.facebook) || undefined} target="_blank" rel="noopener noreferrer" className="p-1.5 text-[var(--on-surface-muted)] hover:text-brand-500 transition-colors">
                             <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                           </a>
                         )}
-                        {member.socialLinks.instagram && (
-                          <a href={member.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="p-1.5 text-[var(--on-surface-muted)] hover:text-brand-500 transition-colors">
+                        {member.socialLinks.instagram && sanitizeExternalUrl(member.socialLinks.instagram) && (
+                          <a href={sanitizeExternalUrl(member.socialLinks.instagram) || undefined} target="_blank" rel="noopener noreferrer" className="p-1.5 text-[var(--on-surface-muted)] hover:text-brand-500 transition-colors">
                             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5"/><circle cx="12" cy="12" r="5"/></svg>
                           </a>
                         )}
-                        {member.socialLinks.linkedin && (
-                          <a href={member.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="p-1.5 text-[var(--on-surface-muted)] hover:text-brand-500 transition-colors">
+                        {member.socialLinks.linkedin && sanitizeExternalUrl(member.socialLinks.linkedin) && (
+                          <a href={sanitizeExternalUrl(member.socialLinks.linkedin) || undefined} target="_blank" rel="noopener noreferrer" className="p-1.5 text-[var(--on-surface-muted)] hover:text-brand-500 transition-colors">
                             <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
                           </a>
                         )}

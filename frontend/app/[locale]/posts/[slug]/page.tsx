@@ -7,13 +7,15 @@ import Avatar from '@/app/components/Avatar'
 import {MorePosts} from '@/app/components/Posts'
 import PortableText from '@/app/components/PortableText'
 import Image from '@/app/components/SanityImage'
+import {buildPageMetadata} from '@/app/lib/metadata'
 import {sanityFetch} from '@/sanity/lib/live'
 import {client} from '@/sanity/lib/client'
 import {postPagesSlugs, postQuery} from '@/sanity/lib/queries'
+import {getAbsoluteUrl} from '@/app/lib/urls'
 import {resolveOpenGraphImage} from '@/sanity/lib/utils'
 
 type Props = {
-  params: Promise<{slug: string}>
+  params: Promise<{locale: string; slug: string}>
 }
 
 /**
@@ -33,36 +35,65 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
   const params = await props.params
   const {data: post} = await sanityFetch({
     query: postQuery,
-    params,
+    params: {slug: params.slug},
     // Metadata should never contain stega
     stega: false,
   })
+  if (!post?._id) {
+    return {}
+  }
   const previousImages = (await parent).openGraph?.images || []
   const ogImage = resolveOpenGraphImage(post?.coverImage)
+  const metadata = buildPageMetadata({
+    locale: params.locale,
+    pathname: `/posts/${params.slug}`,
+    title: post.title || 'Post',
+    description: post.excerpt,
+    image: ogImage ? [ogImage, ...previousImages] : previousImages,
+    type: 'article',
+  })
 
   return {
+    ...metadata,
     authors:
       post?.author?.firstName && post?.author?.lastName
         ? [{name: `${post.author.firstName} ${post.author.lastName}`}]
         : [],
-    title: post?.title,
-    description: post?.excerpt,
-    openGraph: {
-      images: ogImage ? [ogImage, ...previousImages] : previousImages,
-    },
   } satisfies Metadata
 }
 
 export default async function PostPage(props: Props) {
   const params = await props.params
-  const [{data: post}] = await Promise.all([sanityFetch({query: postQuery, params})])
+  const [{data: post}] = await Promise.all([sanityFetch({query: postQuery, params: {slug: params.slug}})])
 
   if (!post?._id) {
     return notFound()
   }
 
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt || undefined,
+    datePublished: post.date || undefined,
+    dateModified: post.date || undefined,
+    url: getAbsoluteUrl(`/${params.locale}/posts/${params.slug}`),
+    image: post.coverImage ? [resolveOpenGraphImage(post.coverImage)?.url].filter(Boolean) : undefined,
+    author:
+      post.author?.firstName && post.author?.lastName
+        ? {
+            '@type': 'Person',
+            name: `${post.author.firstName} ${post.author.lastName}`,
+          }
+        : undefined,
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{__html: JSON.stringify(articleSchema)}}
+      />
       <div className="">
         <div className="container my-12 lg:my-24 grid gap-12">
           <div>
@@ -80,14 +111,11 @@ export default async function PostPage(props: Props) {
               <div className="">
                 {post?.coverImage && (
                   <Image
-                    id={post.coverImage.asset?._ref || ''}
+                    source={post.coverImage}
                     alt={post.coverImage.alt || ''}
                     className="rounded-sm w-full"
                     width={1024}
                     height={538}
-                    mode="cover"
-                    hotspot={post.coverImage.hotspot}
-                    crop={post.coverImage.crop}
                   />
                 )}
               </div>
@@ -104,7 +132,7 @@ export default async function PostPage(props: Props) {
       <div className="border-t border-gray-100 bg-gray-50">
         <div className="container py-12 lg:py-24 grid gap-12">
           <aside>
-            <Suspense>{await MorePosts({skip: post._id, limit: 2})}</Suspense>
+            <Suspense>{await MorePosts({skip: post._id, limit: 2, locale: params.locale})}</Suspense>
           </aside>
         </div>
       </div>

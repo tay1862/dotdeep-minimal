@@ -1,8 +1,10 @@
-'use client'
-
-import {useTranslations} from 'next-intl'
 import Link from 'next/link'
+import {useTranslations} from 'next-intl'
+import {type PortableTextBlock} from 'next-sanity'
+
+import PortableText from '@/app/components/PortableText'
 import ScrollReveal from '@/app/components/ScrollReveal'
+import {getLocalizedValue, type LocalizedPortableText} from '@/sanity/lib/localized'
 
 interface PricingItem {
   _id: string
@@ -18,7 +20,7 @@ interface ServiceData {
   title?: {en?: string; th?: string; lo?: string} | null
   slug?: string | null
   shortDescription?: {en?: string; th?: string; lo?: string} | null
-  description?: {en?: any; th?: any; lo?: any} | null
+  description?: LocalizedPortableText
   icon?: string | null
   features?: Array<{en?: string; th?: string; lo?: string}> | null
   pricingItems?: PricingItem[] | null
@@ -30,6 +32,7 @@ export default function ServiceDetail({service, locale}: {service: ServiceData; 
   const l = locale as 'en' | 'th' | 'lo'
 
   const title = service.title?.[l] || service.title?.en || 'Service'
+  const description = getLocalizedValue(service.description, l)
 
   const currencyFormat = (amount: number, currency: string) => {
     const symbols: Record<string, string> = {LAK: '₭', USD: '$', THB: '฿'}
@@ -55,13 +58,19 @@ export default function ServiceDetail({service, locale}: {service: ServiceData; 
           <p className={`text-lg text-[var(--on-surface-muted)] leading-relaxed mb-10 ${locale === 'lo' ? 'font-lao' : ''}`}>
             {service.shortDescription?.[l] || service.shortDescription?.en || ''}
           </p>
+          {description ? (
+            <PortableText
+              className="max-w-none prose-p:text-on-surface-muted prose-p:leading-relaxed"
+              value={description as PortableTextBlock[]}
+            />
+          ) : null}
         </ScrollReveal>
 
         {/* Features */}
         {service.features && service.features.length > 0 && (
           <ScrollReveal>
             <div className="mb-14">
-              <h2 className="text-xl font-display font-bold mb-6">What&apos;s included</h2>
+              <h2 className="text-xl font-display font-bold mb-6">{t('included')}</h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 {service.features.map((f, i) => (
                   <div key={i} className="flex items-start gap-3 p-4 rounded-xl border border-[var(--border-default)]">
@@ -117,7 +126,7 @@ export default function ServiceDetail({service, locale}: {service: ServiceData; 
         {/* CTA */}
         <ScrollReveal>
           <div className="text-center p-10 rounded-2xl bg-brand-50 dark:bg-brand-950/30">
-            <p className="text-lg font-medium mb-4">Interested in this service?</p>
+            <p className="text-lg font-medium mb-4">{t('interested')}</p>
             <Link
               href={`/${locale}/contact`}
               className="inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 text-white px-7 py-3 font-medium transition-all"

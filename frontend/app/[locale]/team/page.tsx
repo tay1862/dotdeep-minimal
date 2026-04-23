@@ -1,4 +1,6 @@
 import {getTranslations} from 'next-intl/server'
+
+import {buildPageMetadata} from '@/app/lib/metadata'
 import {sanityFetch} from '@/sanity/lib/live'
 import {allTeamQuery} from '@/sanity/lib/queries'
 import TeamGrid from '@/app/components/team/TeamGrid'
@@ -6,10 +8,12 @@ import TeamGrid from '@/app/components/team/TeamGrid'
 export async function generateMetadata({params}: {params: Promise<{locale: string}>}) {
   const {locale} = await params
   const t = await getTranslations({locale, namespace: 'team'})
-  return {
+  return buildPageMetadata({
+    locale,
+    pathname: '/team',
     title: `${t('title')} — DotDeep Design`,
     description: t('subtitle'),
-  }
+  })
 }
 
 export default async function TeamPage({params}: {params: Promise<{locale: string}>}) {

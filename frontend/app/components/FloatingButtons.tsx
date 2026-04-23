@@ -2,6 +2,8 @@
 
 import {useState} from 'react'
 
+import {buildLineUrl, buildMessengerUrl, buildWhatsAppUrl} from '@/app/lib/urls'
+
 interface SiteSettings {
   socialLinks?: {
     whatsapp?: string | null
@@ -13,9 +15,9 @@ interface SiteSettings {
 export default function FloatingButtons({settings}: {settings?: SiteSettings | null}) {
   const [open, setOpen] = useState(false)
 
-  const whatsapp = settings?.socialLinks?.whatsapp
-  const messenger = settings?.socialLinks?.facebook
-  const line = settings?.socialLinks?.line
+  const whatsapp = buildWhatsAppUrl(settings?.socialLinks?.whatsapp)
+  const messenger = buildMessengerUrl(settings?.socialLinks?.facebook)
+  const line = buildLineUrl(settings?.socialLinks?.line)
 
   const hasAny = whatsapp || messenger || line
   if (!hasAny) return null
@@ -30,7 +32,7 @@ export default function FloatingButtons({settings}: {settings?: SiteSettings | n
       >
         {whatsapp && (
           <a
-            href={`https://wa.me/${whatsapp.replace(/\D/g, '')}`}
+            href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2.5 rounded-full bg-[#25D366] px-4 py-2.5 text-white text-sm font-semibold shadow-lg hover:brightness-110 transition-all"
@@ -46,7 +48,7 @@ export default function FloatingButtons({settings}: {settings?: SiteSettings | n
 
         {messenger && (
           <a
-            href={`https://m.me/${messenger.replace(/.*facebook\.com\//i, '').replace(/\//g, '')}`}
+            href={messenger}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2.5 rounded-full bg-[#006AFF] px-4 py-2.5 text-white text-sm font-semibold shadow-lg hover:brightness-110 transition-all"
@@ -61,7 +63,7 @@ export default function FloatingButtons({settings}: {settings?: SiteSettings | n
 
         {line && (
           <a
-            href={`https://line.me/ti/p/${line}`}
+            href={line}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2.5 rounded-full bg-[#06C755] px-4 py-2.5 text-white text-sm font-semibold shadow-lg hover:brightness-110 transition-all"
@@ -80,6 +82,7 @@ export default function FloatingButtons({settings}: {settings?: SiteSettings | n
         onClick={() => setOpen(!open)}
         className={`flex items-center justify-center w-14 h-14 rounded-full bg-brand-500 text-white shadow-xl hover:bg-brand-600 transition-all active:scale-95 ${open ? 'rotate-45' : ''}`}
         aria-label="Contact options"
+        aria-expanded={open}
         style={{transition: 'transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background-color 0.2s'}}
       >
         {open ? (

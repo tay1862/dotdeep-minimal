@@ -18,6 +18,7 @@ interface Project {
 export default function FeaturedProjects({projects, locale}: {projects: Project[]; locale: string}) {
   const t = useTranslations('sections')
   const tGallery = useTranslations('gallery')
+  const tCommon = useTranslations('common')
   const l = locale as 'en' | 'th' | 'lo'
 
   const categoryLabel = (cat: string) => {
@@ -36,7 +37,7 @@ export default function FeaturedProjects({projects, locale}: {projects: Project[
         <ScrollReveal>
           <div className="flex items-end justify-between mb-12">
             <div>
-              <p className="text-sm font-medium text-brand-500 uppercase tracking-wider mb-2">Portfolio</p>
+              <p className="text-sm font-medium text-brand-500 uppercase tracking-wider mb-2">{tCommon('portfolioLabel')}</p>
               <h2 className="text-fluid-2xl font-display font-bold">{t('featuredWork')}</h2>
             </div>
             <Link

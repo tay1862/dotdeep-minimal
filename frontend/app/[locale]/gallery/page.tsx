@@ -1,4 +1,6 @@
 import {getTranslations} from 'next-intl/server'
+
+import {buildPageMetadata} from '@/app/lib/metadata'
 import {sanityFetch} from '@/sanity/lib/live'
 import {allProjectsQuery} from '@/sanity/lib/queries'
 import GalleryGrid from '@/app/components/gallery/GalleryGrid'
@@ -6,10 +8,12 @@ import GalleryGrid from '@/app/components/gallery/GalleryGrid'
 export async function generateMetadata({params}: {params: Promise<{locale: string}>}) {
   const {locale} = await params
   const t = await getTranslations({locale, namespace: 'gallery'})
-  return {
+  return buildPageMetadata({
+    locale,
+    pathname: '/gallery',
     title: `${t('title')} — DotDeep Design`,
-    description: `DotDeep Design portfolio — graphic design, web development, UI/UX design`,
-  }
+    description: t('description'),
+  })
 }
 
 export default async function GalleryPage({params}: {params: Promise<{locale: string}>}) {

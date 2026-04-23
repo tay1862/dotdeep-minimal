@@ -2,8 +2,16 @@
 
 import {useState} from 'react'
 import {useTranslations} from 'next-intl'
+
 import {sendContactForm} from '@/app/[locale]/contact/actions'
 import ScrollReveal from '@/app/components/ScrollReveal'
+import {
+  buildLineUrl,
+  buildMailtoHref,
+  buildMessengerUrl,
+  buildPhoneHref,
+  buildWhatsAppUrl,
+} from '@/app/lib/urls'
 
 interface SiteSettings {
   contactEmail?: string | null
@@ -32,17 +40,22 @@ export default function ContactForm({locale, settings}: {locale: string; setting
   const t = useTranslations('contact')
   const l = locale as 'en' | 'th' | 'lo'
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const [feedback, setFeedback] = useState('')
+  const [submittedAt, setSubmittedAt] = useState(() => String(Date.now()))
 
   const email = settings?.contactEmail
   const phone = settings?.contactPhone
   const address = settings?.address?.[l] || settings?.address?.en
-  const whatsapp = settings?.socialLinks?.whatsapp
-  const messenger = settings?.socialLinks?.facebook
-  const line = settings?.socialLinks?.line
+  const emailHref = buildMailtoHref(email)
+  const phoneHref = buildPhoneHref(phone)
+  const whatsapp = buildWhatsAppUrl(settings?.socialLinks?.whatsapp)
+  const messenger = buildMessengerUrl(settings?.socialLinks?.facebook)
+  const line = buildLineUrl(settings?.socialLinks?.line)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setStatus('sending')
+    setFeedback('')
     const form = e.currentTarget
     const fd = new FormData(form)
 
@@ -52,13 +65,31 @@ export default function ContactForm({locale, settings}: {locale: string; setting
       phone: fd.get('phone') as string,
       service: fd.get('service') as string,
       message: fd.get('message') as string,
+      company: fd.get('company') as string,
+      submittedAt: fd.get('submittedAt') as string,
     })
 
     if (result.success) {
       setStatus('success')
+      setFeedback(t('success'))
       form.reset()
+      setSubmittedAt(String(Date.now()))
     } else {
       setStatus('error')
+      const messageByCode: Record<string, string> = {
+        missing_required: t('errorValidation'),
+        invalid_email: t('errorValidation'),
+        invalid_payload: t('errorValidation'),
+        invalid_service: t('errorValidation'),
+        rate_limited: t('errorRateLimit'),
+        spam_detected: t('errorSpam'),
+        submitted_too_fast: t('errorTooFast'),
+        service_unavailable: t('errorServiceUnavailable'),
+        delivery_failed: t('error'),
+      }
+      const errorCode = 'code' in result ? result.code : undefined
+
+      setFeedback((errorCode && messageByCode[errorCode]) || t('error'))
     }
   }
 
@@ -72,17 +103,13 @@ export default function ContactForm({locale, settings}: {locale: string; setting
           <p className="text-sm font-medium text-brand-500 uppercase tracking-wider mb-2">{t('title')}</p>
           <h1 className="text-fluid-2xl font-display font-bold mb-4">{t('subtitle')}</h1>
           <p className="text-on-surface-muted leading-relaxed mb-10">
-            {locale === 'lo'
-              ? 'ພວກເຮົາຍິນດີຮັບຟັງໂປຣເຈັກຂອງທ່ານ ຕິດຕໍ່ຜ່ານຟອມ ຫຼື ຊ່ອງທາງຂ້າງລຸ່ມ'
-              : locale === 'th'
-              ? 'เรายินดีรับฟังโปรเจคของคุณ ติดต่อผ่านฟอร์มหรือช่องทางด้านล่าง'
-              : "We'd love to hear about your project. Reach out through the form or any of our channels below."}
+            {t('intro')}
           </p>
         </ScrollReveal>
 
         <ScrollReveal delay={100}>
           <div className="space-y-5">
-            {email && (
+            {email && emailHref && (
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-950/50 text-brand-500 flex items-center justify-center shrink-0">
                   <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -91,12 +118,12 @@ export default function ContactForm({locale, settings}: {locale: string; setting
                 </div>
                 <div>
                   <p className="font-semibold text-sm mb-0.5">Email</p>
-                  <a href={`mailto:${email}`} className="text-sm text-on-surface-muted hover:text-brand-500 transition-colors">{email}</a>
+                  <a href={emailHref} className="text-sm text-on-surface-muted hover:text-brand-500 transition-colors">{email}</a>
                 </div>
               </div>
             )}
 
-            {phone && (
+            {phone && phoneHref && (
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-950/50 text-brand-500 flex items-center justify-center shrink-0">
                   <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -105,7 +132,7 @@ export default function ContactForm({locale, settings}: {locale: string; setting
                 </div>
                 <div>
                   <p className="font-semibold text-sm mb-0.5">WhatsApp / Phone</p>
-                  <a href={`tel:${phone.replace(/\s/g, '')}`} className="text-sm text-on-surface-muted hover:text-brand-500 transition-colors">{phone}</a>
+                  <a href={phoneHref} className="text-sm text-on-surface-muted hover:text-brand-500 transition-colors">{phone}</a>
                 </div>
               </div>
             )}
@@ -128,7 +155,7 @@ export default function ContactForm({locale, settings}: {locale: string; setting
             <div className="flex flex-wrap gap-2 pt-2">
               {whatsapp && (
                 <a
-                  href={`https://wa.me/${whatsapp.replace(/\D/g, '')}`}
+                  href={whatsapp}
                   target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-[#25D366] text-white px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all"
                 >
@@ -137,7 +164,7 @@ export default function ContactForm({locale, settings}: {locale: string; setting
               )}
               {messenger && (
                 <a
-                  href={`https://m.me/${messenger.replace(/.*facebook\.com\//i, '').replace(/\//g, '')}`}
+                  href={messenger}
                   target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-[#006AFF] text-white px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all"
                 >
@@ -146,7 +173,7 @@ export default function ContactForm({locale, settings}: {locale: string; setting
               )}
               {line && (
                 <a
-                  href={`https://line.me/ti/p/${line}`}
+                  href={line}
                   target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-[#06C755] text-white px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all"
                 >
@@ -161,6 +188,12 @@ export default function ContactForm({locale, settings}: {locale: string; setting
       {/* Form side */}
       <ScrollReveal delay={200}>
         <form onSubmit={handleSubmit} className="space-y-5 p-8 rounded-2xl border border-border-default bg-surface-raised">
+          <div className="sr-only" aria-hidden="true">
+            <label htmlFor="company">Company</label>
+            <input id="company" name="company" type="text" autoComplete="off" tabIndex={-1} />
+          </div>
+          <input type="hidden" name="submittedAt" value={submittedAt} />
+
           <div>
             <label htmlFor="name" className="block text-sm font-semibold mb-1.5">{t('name')}</label>
             <input id="name" name="name" type="text" required placeholder="John Doe" className={inputClass} />
@@ -191,7 +224,7 @@ export default function ContactForm({locale, settings}: {locale: string; setting
             <label htmlFor="message" className="block text-sm font-semibold mb-1.5">{t('message')}</label>
             <textarea
               id="message" name="message" rows={5} required
-              placeholder={locale === 'lo' ? 'ບອກພວກເຮົາກ່ຽວກັບໂປຣເຈັກຂອງທ່ານ...' : locale === 'th' ? 'บอกเราเกี่ยวกับโปรเจคของคุณ...' : 'Tell us about your project...'}
+              placeholder={t('placeholderMessage')}
               className={`${inputClass} resize-none`}
             />
           </div>
@@ -212,16 +245,22 @@ export default function ContactForm({locale, settings}: {locale: string; setting
             ) : t('send')}
           </button>
 
-          {status === 'success' && (
-            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 rounded-xl px-4 py-3">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
-              {t('success')}
-            </div>
-          )}
-          {status === 'error' && (
-            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-xl px-4 py-3">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-              {t('error')}
+          {status !== 'idle' && status !== 'sending' && feedback && (
+            <div
+              role="status"
+              aria-live="polite"
+              className={`flex items-center gap-2 text-sm rounded-xl px-4 py-3 ${
+                status === 'success'
+                  ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30'
+                  : 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30'
+              }`}
+            >
+              {status === 'success' ? (
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+              ) : (
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              )}
+              {feedback}
             </div>
           )}
         </form>

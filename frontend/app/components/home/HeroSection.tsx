@@ -3,8 +3,12 @@
 import {useTranslations} from 'next-intl'
 import Link from 'next/link'
 import {useEffect, useRef, useState} from 'react'
+
 import SanityImage from '@/app/components/SanityImage'
 import ScrollReveal from '@/app/components/ScrollReveal'
+import useReducedMotion from '@/app/components/useReducedMotion'
+import {resolveLocalizedInternalPath} from '@/app/lib/urls'
+import {getLocalizedValue, type LocalizedString} from '@/sanity/lib/localized'
 
 interface HeroData {
   heroHeading?: {en?: string; th?: string; lo?: string} | null
@@ -12,52 +16,77 @@ interface HeroData {
   heroCtaText?: {en?: string; th?: string; lo?: string} | null
   heroCtaLink?: string | null
   heroImage?: {asset?: {_ref?: string}} | null
+  stats?: Array<{
+    value?: string | null
+    suffix?: string | null
+    label?: LocalizedString
+  }> | null
 }
 
-// Animated counter hook
-function useCounter(target: number, duration = 1800, start = false) {
+function parseStatValue(value?: string | null) {
+  const numericValue = Number.parseFloat((value || '').replace(/[^0-9.]/g, ''))
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+function useCounter(target: number, duration = 1800, start = false, reducedMotion = false) {
   const [count, setCount] = useState(0)
+
   useEffect(() => {
-    if (!start) return
+    if (!start || reducedMotion) {
+      return
+    }
+
     let startTime: number
+    let frameId = 0
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp
       const progress = Math.min((timestamp - startTime) / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
       setCount(Math.floor(eased * target))
-      if (progress < 1) requestAnimationFrame(step)
+      if (progress < 1) {
+        frameId = requestAnimationFrame(step)
+      }
     }
-    requestAnimationFrame(step)
-  }, [target, duration, start])
-  return count
+
+    frameId = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(frameId)
+  }, [duration, reducedMotion, start, target])
+
+  return reducedMotion ? target : count
 }
 
-// Floating badge component
 function FloatingBadge({
   value,
   label,
   suffix = '',
   delay = 0,
   className = '',
+  reducedMotion = false,
 }: {
   value: number
   label: string
   suffix?: string
   delay?: number
   className?: string
+  reducedMotion?: boolean
 }) {
   const [visible, setVisible] = useState(false)
-  const count = useCounter(value, 1600, visible)
+  const isVisible = reducedMotion || visible
+  const count = useCounter(value, 1600, visible, reducedMotion)
 
   useEffect(() => {
+    if (reducedMotion) {
+      return
+    }
+
     const t = setTimeout(() => setVisible(true), delay + 800)
     return () => clearTimeout(t)
-  }, [delay])
+  }, [delay, reducedMotion])
 
   return (
     <div
       className={`absolute bg-surface/90 dark:bg-neutral-900/90 backdrop-blur-md border border-border-default rounded-2xl px-4 py-3 shadow-xl transition-all duration-700 ${
-        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       } ${className}`}
     >
       <p className="text-2xl font-display font-bold text-brand-500 leading-none">
@@ -68,14 +97,11 @@ function FloatingBadge({
   )
 }
 
-// Marquee ticker
-const TICKER_ITEMS = ['Graphic Design', 'Web Development', 'UI/UX Design', 'Video Production', 'Brand Identity', 'Motion Graphics']
-
-function Ticker() {
+function Ticker({items}: {items: string[]}) {
   return (
     <div className="overflow-hidden border-y border-border-default py-3 bg-surface-raised">
-      <div className="flex gap-12 animate-[marquee_20s_linear_infinite] whitespace-nowrap w-max">
-        {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
+      <div className="flex gap-12 animate-[marquee_20s_linear_infinite] motion-reduce:animate-none whitespace-nowrap w-max">
+        {[...items, ...items].map((item, i) => (
           <span key={i} className="text-xs font-medium uppercase tracking-[0.2em] text-on-surface-muted flex items-center gap-3">
             <span className="w-1 h-1 rounded-full bg-brand-500 inline-block" />
             {item}
@@ -88,16 +114,33 @@ function Ticker() {
 
 export default function HeroSection({data, locale}: {data: HeroData | null; locale: string}) {
   const t = useTranslations('hero')
+  const tGallery = useTranslations('gallery')
   const l = locale as 'en' | 'th' | 'lo'
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const prefersReducedMotion = useReducedMotion()
 
   const heading = data?.heroHeading?.[l] || t('tagline')
   const subheading = data?.heroSubheading?.[l] || t('subtitle')
   const ctaText = data?.heroCtaText?.[l] || t('cta')
-  const ctaLink = data?.heroCtaLink || `/${locale}/gallery`
+  const ctaLink = resolveLocalizedInternalPath(data?.heroCtaLink, locale) || `/${locale}/gallery`
+  const stats =
+    data?.stats
+      ?.map((stat) => ({
+        value: parseStatValue(stat.value),
+        suffix: stat.suffix || '',
+        label: getLocalizedValue(stat.label, l, '') || '',
+      }))
+      .filter((stat): stat is {value: number; suffix: string; label: string} => stat.value != null && !!stat.label) || []
+  const featuredStats = stats.slice(0, 2)
+  const summaryStats = stats.slice(0, 3)
+  const tickerItems = [tGallery('graphic'), tGallery('web'), tGallery('uiux'), tGallery('video')]
 
   // Particle canvas effect
   useEffect(() => {
+    if (prefersReducedMotion) {
+      return
+    }
+
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -160,10 +203,10 @@ export default function HeroSection({data, locale}: {data: HeroData | null; loca
       cancelAnimationFrame(animId)
       window.removeEventListener('resize', resize)
     }
-  }, [])
+  }, [prefersReducedMotion])
 
   // Split heading for word-by-word animation
-  const words = heading.split(' ')
+  const words = prefersReducedMotion ? [heading] : heading.split(' ')
 
   return (
     <>
@@ -201,8 +244,10 @@ export default function HeroSection({data, locale}: {data: HeroData | null; loca
                     <span
                       className="inline-block"
                       style={{
-                        animation: `slideUp 0.6s cubic-bezier(0.16,1,0.3,1) both`,
-                        animationDelay: `${i * 80 + 200}ms`,
+                        animation: prefersReducedMotion
+                          ? undefined
+                          : `slideUp 0.6s cubic-bezier(0.16,1,0.3,1) both`,
+                        animationDelay: prefersReducedMotion ? undefined : `${i * 80 + 200}ms`,
                       }}
                     >
                       {i === words.length - 1 ? (
@@ -242,31 +287,21 @@ export default function HeroSection({data, locale}: {data: HeroData | null; loca
                 </div>
               </ScrollReveal>
 
-              {/* Trust indicators */}
-              <ScrollReveal delay={600}>
-                <div className="flex items-center gap-6 mt-10 pt-8 border-t border-border-default">
-                  <div className="flex -space-x-2">
-                    {[...Array(4)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-8 h-8 rounded-full border-2 border-surface bg-gradient-to-br from-brand-300 to-brand-600"
-                        style={{zIndex: 4 - i}}
-                      />
+              {summaryStats.length > 0 && (
+                <ScrollReveal delay={600}>
+                  <div className="flex flex-wrap items-center gap-6 mt-10 pt-8 border-t border-border-default">
+                    {summaryStats.map((stat) => (
+                      <div key={`${stat.label}-${stat.value}`} className="flex flex-col gap-1">
+                        <span className="text-lg font-display font-semibold text-on-surface">
+                          {stat.value}
+                          {stat.suffix}
+                        </span>
+                        <span className="text-sm text-on-surface-muted">{stat.label}</span>
+                      </div>
                     ))}
                   </div>
-                  <p className="text-sm text-on-surface-muted">
-                    <span className="font-semibold text-on-surface">50+</span> happy clients
-                  </p>
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-accent-500">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
-                    ))}
-                    <span className="text-xs text-on-surface-muted ml-1">5.0</span>
-                  </div>
-                </div>
-              </ScrollReveal>
+                </ScrollReveal>
+              )}
             </div>
 
             {/* Visual side */}
@@ -304,9 +339,26 @@ export default function HeroSection({data, locale}: {data: HeroData | null; loca
                   <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 to-transparent" />
                 </div>
 
-                {/* Floating stat badges */}
-                <FloatingBadge value={50} suffix="+" label="Projects Done" delay={0} className="-top-4 -left-4 lg:-left-8" />
-                <FloatingBadge value={3} suffix="+" label="Years Experience" delay={200} className="-bottom-4 -right-4 lg:-right-8" />
+                {featuredStats[0] ? (
+                  <FloatingBadge
+                    value={featuredStats[0].value}
+                    suffix={featuredStats[0].suffix}
+                    label={featuredStats[0].label}
+                    delay={0}
+                    className="-top-4 -left-4 lg:-left-8"
+                    reducedMotion={prefersReducedMotion}
+                  />
+                ) : null}
+                {featuredStats[1] ? (
+                  <FloatingBadge
+                    value={featuredStats[1].value}
+                    suffix={featuredStats[1].suffix}
+                    label={featuredStats[1].label}
+                    delay={200}
+                    className="-bottom-4 -right-4 lg:-right-8"
+                    reducedMotion={prefersReducedMotion}
+                  />
+                ) : null}
 
                 {/* Decorative ring */}
                 <div className="absolute -inset-4 rounded-[2rem] border border-brand-200/40 dark:border-brand-700/30 pointer-events-none" />
@@ -317,7 +369,7 @@ export default function HeroSection({data, locale}: {data: HeroData | null; loca
       </section>
 
       {/* Ticker */}
-      <Ticker />
+      <Ticker items={tickerItems} />
 
       <style>{`
         @keyframes slideUp {

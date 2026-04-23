@@ -56,11 +56,10 @@ export default function CTA({block}: CtaProps) {
 
           {image?.asset?._ref && (
             <Image
-              id={image.asset._ref}
-              alt="Demo image"
+              source={image}
+              alt={heading || 'Call to action'}
               width={704}
-              crop={image.crop}
-              mode="cover"
+              fit="crop"
               className="rounded-sm"
             />
           )}

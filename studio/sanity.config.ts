@@ -20,6 +20,7 @@ import {assist} from '@sanity/assist'
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
 const previewUrl = process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:3000'
+const defaultPreviewLocale = 'en'
 
 if (!projectId) {
   throw new Error('Missing SANITY_STUDIO_PROJECT_ID (or NEXT_PUBLIC_SANITY_PROJECT_ID) for Sanity Studio')
@@ -28,7 +29,7 @@ if (!projectId) {
 // Define the home location for the presentation tool
 const homeLocation = {
   title: 'Home',
-  href: '/',
+  href: `/${defaultPreviewLocale}`,
 } satisfies DocumentLocation
 
 // resolveHref() is a convenience function that resolves the URL
@@ -36,9 +37,13 @@ const homeLocation = {
 function resolveHref(documentType?: string, slug?: string): string | undefined {
   switch (documentType) {
     case 'post':
-      return slug ? `/posts/${slug}` : undefined
+      return slug ? `/${defaultPreviewLocale}/posts/${slug}` : undefined
     case 'page':
-      return slug ? `/${slug}` : undefined
+      return slug ? `/${defaultPreviewLocale}/${slug}` : undefined
+    case 'project':
+      return slug ? `/${defaultPreviewLocale}/gallery/${slug}` : undefined
+    case 'service':
+      return slug ? `/${defaultPreviewLocale}/services/${slug}` : undefined
     default:
       console.warn('Invalid document type:', documentType)
       return undefined
@@ -66,16 +71,24 @@ export default defineConfig({
         // The Main Document Resolver API provides a method of resolving a main document from a given route or route pattern. https://www.sanity.io/docs/visual-editing/presentation-resolver-api#57720a5678d9
         mainDocuments: defineDocuments([
           {
-            route: '/',
-            filter: `_type == "settings" && _id == "siteSettings"`,
+            route: `/${defaultPreviewLocale}`,
+            filter: `_type == "homePage"`,
           },
           {
-            route: '/:slug',
-            filter: `_type == "page" && slug.current == $slug || _id == $slug`,
+            route: `/${defaultPreviewLocale}/:slug`,
+            filter: `_type == "page" && (slug.current == $slug || _id == $slug)`,
           },
           {
-            route: '/posts/:slug',
-            filter: `_type == "post" && slug.current == $slug || _id == $slug`,
+            route: `/${defaultPreviewLocale}/posts/:slug`,
+            filter: `_type == "post" && (slug.current == $slug || _id == $slug)`,
+          },
+          {
+            route: `/${defaultPreviewLocale}/gallery/:slug`,
+            filter: `_type == "project" && (slug.current == $slug || _id == $slug)`,
+          },
+          {
+            route: `/${defaultPreviewLocale}/services/:slug`,
+            filter: `_type == "service" && (slug.current == $slug || _id == $slug)`,
           },
         ]),
         // Locations Resolver API allows you to define where data is being used in your application. https://www.sanity.io/docs/visual-editing/presentation-resolver-api#8d8bca7bfcd7
@@ -83,6 +96,11 @@ export default defineConfig({
           settings: defineLocations({
             locations: [homeLocation],
             message: 'This document is used on all pages',
+            tone: 'positive',
+          }),
+          homePage: defineLocations({
+            locations: [homeLocation],
+            message: 'This document powers the localized home page',
             tone: 'positive',
           }),
           page: defineLocations({
@@ -112,9 +130,37 @@ export default defineConfig({
                 },
                 {
                   title: 'Home',
-                  href: '/',
+                  href: `/${defaultPreviewLocale}`,
                 } satisfies DocumentLocation,
               ].filter(Boolean) as DocumentLocation[],
+            }),
+          }),
+          project: defineLocations({
+            select: {
+              title: 'title.en',
+              slug: 'slug.current',
+            },
+            resolve: (doc) => ({
+              locations: [
+                {
+                  title: doc?.title || 'Untitled project',
+                  href: resolveHref('project', doc?.slug)!,
+                },
+              ],
+            }),
+          }),
+          service: defineLocations({
+            select: {
+              title: 'title.en',
+              slug: 'slug.current',
+            },
+            resolve: (doc) => ({
+              locations: [
+                {
+                  title: doc?.title || 'Untitled service',
+                  href: resolveHref('service', doc?.slug)!,
+                },
+              ],
             }),
           }),
         },

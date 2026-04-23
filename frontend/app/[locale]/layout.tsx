@@ -14,6 +14,10 @@ import {locales} from '@/i18n/config'
 import {sanityFetch} from '@/sanity/lib/live'
 import {siteSettingsQuery} from '@/sanity/lib/queries'
 
+export function generateStaticParams() {
+  return locales.map((locale) => ({locale}))
+}
+
 export default async function LocaleLayout({
   children,
   params,
@@ -30,7 +34,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <div lang={locale} data-locale={locale} className="min-h-screen flex flex-col">
+      <div data-locale={locale} className="min-h-screen flex flex-col">
         <Toaster />
         {isDraftMode && (
           <>
